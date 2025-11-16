@@ -1,4 +1,4 @@
-import { ChevronDown, Gift, Wallet, TrendingUp } from 'lucide-react'
+import { ChevronDown, Gift } from 'lucide-react'
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 
@@ -16,8 +16,8 @@ interface Token {
 function Dashboard() {
   const { wallets } = useApp()
   const [selectedTab, setSelectedTab] = useState('Tokens')
-  const [selectedAccount, setSelectedAccount] = useState('0xa878...b0e1D1')
-  const [selectedNetworks, setSelectedNetworks] = useState('8 Networks')
+  const selectedAccount = '0xa878...b0e1D1'
+  const selectedNetworks = '8 Networks'
 
   const totalBalance = wallets[0]?.balance || 1.70
   const balanceChange = 0.03

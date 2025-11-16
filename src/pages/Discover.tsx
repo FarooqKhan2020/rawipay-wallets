@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Trophy, Flame, TrendingUp, TrendingDown, ChevronDown } from 'lucide-react'
+import { Trophy, Flame, TrendingUp, TrendingDown, ChevronDown } from 'lucide-react'
 
 interface Token {
   rank: number
@@ -17,7 +17,7 @@ interface Token {
 function Discover() {
   const [activeTab, setActiveTab] = useState('Tokens')
   const [activeFilter, setActiveFilter] = useState('Popular')
-  const [selectedNetwork, setSelectedNetwork] = useState('All networks')
+  const selectedNetwork = 'All networks'
 
   const tabs = ['Tokens', 'Sites', 'NFTs', 'Games', 'Networks']
 

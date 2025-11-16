@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 function Sidebar() {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const { resolvedTheme } = useTheme()
+  const { } = useTheme()
 
   const menuItems = [
     { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },

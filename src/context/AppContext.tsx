@@ -33,7 +33,7 @@ interface AppContextType {
   rewards: Reward
   updateSpending: (amount: number) => void
   tier: Tier
-  updateTierProgress: (spent: number) => void
+  updateTierProgress: () => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -54,7 +54,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     // Sync balance with backend on load
     if (saved) {
-      saved.forEach((wallet) => {
+      saved.forEach((wallet: Wallet) => {
         fetch(`${API_BASE}/user/${wallet.address}/balance`)
           .then((res) => res.json())
           .then((data) => {
@@ -243,7 +243,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const updateTierProgress = (spent: number) => {
+  const updateTierProgress = () => {
     // This is now handled in updateSpending
   }
 
