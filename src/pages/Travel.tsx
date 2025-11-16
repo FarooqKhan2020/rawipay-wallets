@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
 import ConfirmModal from '../components/ConfirmModal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Users, Search, Plane, Clock, DollarSign, Hotel, MapPin, Star, Wifi, Car, Utensils, Bed, ArrowRight, X, Info, Luggage, UtensilsCrossed, Briefcase, Tv, Wind, Coffee, Shield, CheckCircle, AlertCircle } from 'lucide-react'
+import { Calendar, Users, Search, Plane, Clock, Hotel, MapPin, Star, Wifi, Car, Utensils, Bed, ArrowRight, X, Info, Luggage, UtensilsCrossed, Briefcase, Shield, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface Airport {
   code: string

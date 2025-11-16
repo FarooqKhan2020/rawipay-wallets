@@ -1,4 +1,4 @@
-import { Search, Bell, Play, Plus, Sun, Moon, Monitor } from 'lucide-react'
+import { Search, Bell, Play, Plus, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
 function Header() {

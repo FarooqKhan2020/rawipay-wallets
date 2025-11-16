@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { ChevronDown, ArrowUpDown, Settings, Info } from 'lucide-react'
+import { ChevronDown, ArrowUpDown } from 'lucide-react'
 
 function MoveCrypto() {
   const [fromToken, setFromToken] = useState('ETH')
   const [toToken, setToToken] = useState('')
   const [fromAmount, setFromAmount] = useState('0')
   const [toAmount, setToAmount] = useState('0')
-  const [selectedNetwork, setSelectedNetwork] = useState('Ethereum')
+  const selectedNetwork = 'Ethereum'
   const [showAdvanced, setShowAdvanced] = useState(false)
 
   const tokens = [
@@ -16,8 +16,6 @@ function MoveCrypto() {
     { symbol: 'DAI', name: 'Dai Stablecoin', logo: '🔷' },
     { symbol: 'WBTC', name: 'Wrapped Bitcoin', logo: '₿' },
   ]
-
-  const networks = ['Ethereum', 'Polygon', 'BNB Chain', 'Arbitrum', 'Optimism', 'Base']
 
   const handleSwap = () => {
     const temp = fromToken

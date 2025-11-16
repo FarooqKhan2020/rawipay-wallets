@@ -6,15 +6,11 @@ import {
   Search,
   ShoppingCart,
   Star,
-  ChevronRight,
   X,
   Plus,
   Minus,
-  MapPin,
-  CreditCard,
   Package,
   CheckCircle,
-  Truck,
   History,
 } from 'lucide-react'
 

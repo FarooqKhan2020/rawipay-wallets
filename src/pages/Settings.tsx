@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { useTheme } from '../context/ThemeContext'
-import { Settings as SettingsIcon, Network, User, Shield, Bell, Copy, MoreVertical, Plus, LogOut, ChevronDown, Check, Globe } from 'lucide-react'
+import { Settings as SettingsIcon, Network, User, Shield, Bell, Copy, MoreVertical, Plus, LogOut, ChevronDown, Check } from 'lucide-react'
 
 function Settings() {
   const [activeSection, setActiveSection] = useState('General')
-  const { wallets, addWallet, removeWallet, disconnectWallet } = useApp()
+  const { wallets, addWallet, disconnectWallet } = useApp()
   const [showAddWallet, setShowAddWallet] = useState(false)
   const [newWalletAddress, setNewWalletAddress] = useState('')
   

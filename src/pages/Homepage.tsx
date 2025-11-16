@@ -15,20 +15,14 @@ import {
   Plane,
   Gift,
   Settings,
-  Smartphone,
   Check,
-  Play,
-  Star,
   Award,
   CreditCard,
-  Coins,
   Receipt,
   Clock,
   FileText,
   BarChart3,
   Bell,
-  Hotel,
-  History,
 } from 'lucide-react'
 import { useRef } from 'react'
 
