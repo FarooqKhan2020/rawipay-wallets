@@ -1,0 +1,390 @@
+import { useState } from 'react'
+import { useApp } from '../context/AppContext'
+import { useTheme } from '../context/ThemeContext'
+import { Settings as SettingsIcon, Network, User, Shield, Bell, Copy, MoreVertical, Plus, LogOut, ChevronDown, Check, Globe } from 'lucide-react'
+
+function Settings() {
+  const [activeSection, setActiveSection] = useState('General')
+  const { wallets, addWallet, removeWallet, disconnectWallet } = useApp()
+  const [showAddWallet, setShowAddWallet] = useState(false)
+  const [newWalletAddress, setNewWalletAddress] = useState('')
+  
+  // General settings state
+  const [currency, setCurrency] = useState('USD - US Dollar')
+  const { theme: appTheme, setTheme: setAppTheme } = useTheme()
+  const [identicon, setIdenticon] = useState('Maskicon')
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false)
+  const [showIdenticonDropdown, setShowIdenticonDropdown] = useState(false)
+  
+  // Networks state
+  const [networks, setNetworks] = useState([
+    { id: 'ethereum', name: 'Ethereum', icon: '💎', enabled: true, default: true },
+    { id: 'optimism', name: 'Optimism', icon: 'OP', enabled: true, default: true },
+    { id: 'bnb', name: 'BNB Chain', icon: 'BNB', enabled: true, default: true },
+    { id: 'polygon', name: 'Polygon', icon: '∞', enabled: true, default: true },
+    { id: 'base', name: 'Base', icon: 'Base', enabled: true, default: true },
+    { id: 'arbitrum', name: 'Arbitrum', icon: 'A', enabled: true, default: true },
+    { id: 'linea', name: 'Linea', icon: 'L', enabled: true, default: true },
+    { id: 'sei', name: 'Sei', icon: 'Sei', enabled: true, default: true },
+    { id: 'cronos', name: 'Cronos', icon: 'C', enabled: false, default: false },
+  ])
+
+  const settingsSections = [
+    { id: 'General', icon: SettingsIcon },
+    { id: 'Networks', icon: Network },
+    { id: 'Accounts', icon: User },
+    { id: 'About & Privacy', icon: Shield },
+    { id: 'Notifications', icon: Bell },
+  ]
+
+  const handleAddWallet = () => {
+    if (newWalletAddress.trim()) {
+      const newWallet = {
+        id: Date.now().toString(),
+        address: newWalletAddress.trim(),
+        balance: 0,
+        connection: 'Connected' as const,
+        network: 'Ethereum',
+      }
+      addWallet(newWallet)
+      setNewWalletAddress('')
+      setShowAddWallet(false)
+    }
+  }
+
+  const handleDisconnectAll = () => {
+    wallets.forEach((wallet) => disconnectWallet(wallet.id))
+  }
+
+  const copyAddress = (address: string) => {
+    navigator.clipboard.writeText(address)
+  }
+
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-6)}`
+  }
+
+  return (
+    <div className="flex h-full min-h-[calc(100vh-80px)] p-6">
+      {/* Settings Sidebar */}
+      <div className="w-64 border-r border-dark-border bg-dark-surface">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold mb-6">Settings</h1>
+          <nav className="space-y-1">
+            {settingsSections.map((section) => {
+              const Icon = section.icon
+              const isActive = activeSection === section.id
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
+                    isActive
+                      ? 'bg-primary text-white'
+                      : 'text-gray-400 hover:bg-dark-card hover:text-white'
+                  }`}
+                >
+                  <Icon size={20} />
+                  <span>{section.id}</span>
+                </button>
+              )
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        {activeSection === 'Accounts' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Accounts</h2>
+                <p className="text-gray-400">Connect or watch multiple accounts at once.</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDisconnectAll}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                >
+                  <LogOut size={16} />
+                  Disconnect wallets
+                </button>
+                <button
+                  onClick={() => setShowAddWallet(!showAddWallet)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-dark-bg rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <Plus size={16} />
+                  Add account
+                </button>
+              </div>
+            </div>
+
+            {showAddWallet && (
+              <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Add New Wallet</h3>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Enter wallet address (0x...)"
+                    value={newWalletAddress}
+                    onChange={(e) => setNewWalletAddress(e.target.value)}
+                    className="flex-1 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary"
+                  />
+                  <button
+                    onClick={handleAddWallet}
+                    className="px-6 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+                  >
+                    Connect
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddWallet(false)
+                      setNewWalletAddress('')
+                    }}
+                    className="px-6 py-2 bg-dark-surface border border-dark-border rounded-lg hover:bg-dark-bg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Accounts Table */}
+            <div className="bg-dark-card border border-dark-border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-dark-surface border-b border-dark-border">
+                  <tr>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Address</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Balance</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Connection</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {wallets.map((wallet) => (
+                    <tr key={wallet.id} className="border-b border-dark-border hover:bg-dark-surface transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold">R</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono">{formatAddress(wallet.address)}</span>
+                            <button
+                              onClick={() => copyAddress(wallet.address)}
+                              className="text-gray-400 hover:text-white transition-colors"
+                            >
+                              <Copy size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="font-semibold">${wallet.balance.toFixed(2)}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            wallet.connection === 'Connected'
+                              ? 'bg-green-500/20 text-green-400'
+                              : 'bg-gray-500/20 text-gray-400'
+                          }`}
+                        >
+                          {wallet.connection}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <button className="text-gray-400 hover:text-white transition-colors">
+                          <MoreVertical size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'General' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-bold">General</h2>
+            
+            {/* Currency Conversion */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Currency Conversion</h3>
+                <p className="text-sm text-gray-400 mb-4">Base Currency for market value</p>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                    className="w-full md:w-64 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg flex items-center justify-between hover:border-primary transition-colors"
+                  >
+                    <span>{currency}</span>
+                    <ChevronDown size={16} />
+                  </button>
+                  {showCurrencyDropdown && (
+                    <div className="absolute top-full mt-2 w-full md:w-64 bg-dark-surface border border-dark-border rounded-lg shadow-lg z-10">
+                      {['USD - US Dollar', 'EUR - Euro', 'GBP - British Pound', 'JPY - Japanese Yen', 'CNY - Chinese Yuan'].map((curr) => (
+                        <button
+                          key={curr}
+                          onClick={() => {
+                            setCurrency(curr)
+                            setShowCurrencyDropdown(false)
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-dark-card flex items-center justify-between"
+                        >
+                          <span>{curr}</span>
+                          {currency === curr && <Check size={16} className="text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Theme */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Theme</h3>
+              <div className="flex gap-4">
+                {(['light', 'dark', 'system'] as const).map((th) => {
+                  const displayName = th.charAt(0).toUpperCase() + th.slice(1)
+                  return (
+                    <button
+                      key={th}
+                      onClick={() => setAppTheme(th)}
+                      className={`px-6 py-3 rounded-lg border transition-colors ${
+                        appTheme === th
+                          ? 'bg-primary border-primary text-white'
+                          : 'bg-dark-surface border-dark-border text-gray-400 hover:border-primary/50'
+                      }`}
+                    >
+                      {displayName}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Account Identicon */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Account Identicon</h3>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowIdenticonDropdown(!showIdenticonDropdown)}
+                    className="w-full md:w-64 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg flex items-center justify-between hover:border-primary transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center text-xs font-bold">M</div>
+                      <span>{identicon}</span>
+                    </div>
+                    <ChevronDown size={16} />
+                  </button>
+                  {showIdenticonDropdown && (
+                    <div className="absolute top-full mt-2 w-full md:w-64 bg-dark-surface border border-dark-border rounded-lg shadow-lg z-10">
+                      {['Jazzicon', 'Blockies', 'Maskicon'].map((icon) => (
+                        <button
+                          key={icon}
+                          onClick={() => {
+                            setIdenticon(icon)
+                            setShowIdenticonDropdown(false)
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-dark-card flex items-center justify-between"
+                        >
+                          <span>{icon}</span>
+                          {identicon === icon && <Check size={16} className="text-primary" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'Networks' && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Supported Networks</h2>
+              <p className="text-gray-400">Enable or disable networks to load portfolio data for that network.</p>
+            </div>
+            
+            <div className="bg-dark-card border border-dark-border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-dark-surface border-b border-dark-border">
+                  <tr>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Network</th>
+                    <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {networks.map((network) => (
+                    <tr key={network.id} className="border-b border-dark-border hover:bg-dark-surface transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-xs font-bold">
+                            {network.icon}
+                          </div>
+                          <span className="font-medium">{network.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        {network.default ? (
+                          <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                            Default
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setNetworks(networks.map((n) =>
+                                n.id === network.id ? { ...n, enabled: !n.enabled } : n
+                              ))
+                            }}
+                            className={`relative w-12 h-6 rounded-full transition-colors ${
+                              network.enabled ? 'bg-primary' : 'bg-gray-600'
+                            }`}
+                          >
+                            <div
+                              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                                network.enabled ? 'translate-x-6' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'About & Privacy' && (
+          <div>
+            <h2 className="text-3xl font-bold mb-6">About & Privacy</h2>
+            <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+              <p className="text-gray-400">About & Privacy settings coming soon</p>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'Notifications' && (
+          <div>
+            <h2 className="text-3xl font-bold mb-6">Notifications</h2>
+            <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+              <p className="text-gray-400">Notification settings coming soon</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export default Settings
+
