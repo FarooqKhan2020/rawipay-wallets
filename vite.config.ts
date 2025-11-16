@@ -17,4 +17,9 @@ export default defineConfig(({ mode }) => ({
       "@": "/src",
     },
   },
+  build: {
+    outDir: 'dist', // ensure Vercel knows where to find build output
+    emptyOutDir: true, 
+  },
+  base: '/', // important for serving static assets correctly
 }))
