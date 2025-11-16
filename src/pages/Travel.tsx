@@ -287,7 +287,7 @@ function Travel() {
             className={`px-6 py-3 font-semibold border-b-2 transition-all duration-200 ${
               activeTab === 'flights'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-gray-400 hover:text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -304,7 +304,7 @@ function Travel() {
             className={`px-6 py-3 font-semibold border-b-2 transition-all duration-200 ${
               activeTab === 'hotels'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-gray-400 hover:text-white'
+                : 'border-transparent text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -318,16 +318,14 @@ function Travel() {
         {activeTab === 'flights' && (
           <>
             {/* Search Form */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6 mb-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-              <div className="relative">
-                <div className="flex gap-4 mb-6">
+            <div className="p-6 mb-6 bg-white/[0.02] border border-white/[0.05] rounded-xl space-y-4">
+              <div className="flex gap-4 mb-6">
                   <button
                     onClick={() => setSearchType('one-way')}
                     className={`px-6 py-2.5 rounded-xl transition-all font-medium ${
                       searchType === 'one-way'
-                        ? 'bg-white/10 border border-white/20 text-white'
-                        : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                        : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     One Way
@@ -336,8 +334,8 @@ function Travel() {
                     onClick={() => setSearchType('round-trip')}
                     className={`px-6 py-2.5 rounded-xl transition-all font-medium ${
                       searchType === 'round-trip'
-                        ? 'bg-white/10 border border-white/20 text-white'
-                        : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                        : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     Round Trip
@@ -350,7 +348,7 @@ function Travel() {
                     <select
                       value={from}
                       onChange={(e) => setFrom(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     >
                       <option value="">Select City</option>
                       {airports.map((airport) => (
@@ -366,7 +364,7 @@ function Travel() {
                     <select
                       value={to}
                       onChange={(e) => setTo(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     >
                       <option value="">Select City</option>
                       {airports.map((airport) => (
@@ -384,7 +382,7 @@ function Travel() {
                       value={departureDate}
                       onChange={(e) => setDepartureDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     />
                   </div>
 
@@ -396,7 +394,7 @@ function Travel() {
                         value={returnDate}
                         onChange={(e) => setReturnDate(e.target.value)}
                         min={departureDate || new Date().toISOString().split('T')[0]}
-                        className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                       />
                     </div>
                   )}
@@ -411,7 +409,7 @@ function Travel() {
                           onChange={(e) => setPassengers(parseInt(e.target.value) || 1)}
                           min={1}
                           max={9}
-                          className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                          className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                         />
                         <Users className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                       </div>
@@ -429,7 +427,7 @@ function Travel() {
                         onChange={(e) => setPassengers(parseInt(e.target.value) || 1)}
                         min={1}
                         max={9}
-                        className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                        className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                       />
                       <Users className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     </div>
@@ -444,7 +442,6 @@ function Travel() {
                   <Search size={20} />
                   {loadingFlights ? 'Searching...' : 'Search Flights'}
                 </button>
-              </div>
             </div>
 
             {/* Flight Results */}
@@ -454,7 +451,7 @@ function Travel() {
                 {flights.map((flight) => (
                   <div
                     key={flight.id}
-                    className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6 hover:border-white/20 transition-all group"
+                      className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:border-white/[0.08] hover:bg-white/[0.04] transition-all group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="relative">
@@ -541,16 +538,14 @@ function Travel() {
         {activeTab === 'hotels' && (
           <>
             {/* Search Form */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6 mb-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-              <div className="relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-6 mb-6 bg-white/[0.02] border border-white/[0.05] rounded-xl space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">City</label>
                     <select
                       value={hotelCity}
                       onChange={(e) => setHotelCity(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     >
                       <option value="">Select City</option>
                       {cities.map((city) => (
@@ -568,7 +563,7 @@ function Travel() {
                       value={checkIn}
                       onChange={(e) => setCheckIn(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     />
                   </div>
 
@@ -579,7 +574,7 @@ function Travel() {
                       value={checkOut}
                       onChange={(e) => setCheckOut(e.target.value)}
                       min={checkIn || new Date().toISOString().split('T')[0]}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                     />
                   </div>
 
@@ -589,7 +584,7 @@ function Travel() {
                       <select
                         value={rooms}
                         onChange={(e) => setRooms(parseInt(e.target.value))}
-                        className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                        className="px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                       >
                         {[1, 2, 3, 4].map((num) => (
                           <option key={num} value={num}>
@@ -600,7 +595,7 @@ function Travel() {
                       <select
                         value={guests}
                         onChange={(e) => setGuests(parseInt(e.target.value))}
-                        className="px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-all"
+                        className="px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 transition-all"
                       >
                         {[1, 2, 3, 4, 5, 6].map((num) => (
                           <option key={num} value={num}>
@@ -620,7 +615,6 @@ function Travel() {
                   <Search size={20} />
                   {loadingHotels ? 'Searching...' : 'Search Hotels'}
                 </button>
-              </div>
             </div>
 
             {/* Hotel Results */}
@@ -634,7 +628,7 @@ function Travel() {
                   return (
                     <div
                       key={hotel.id}
-                      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 overflow-hidden hover:border-white/20 transition-all group"
+                      className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:border-white/[0.08] hover:bg-white/[0.04] transition-all group"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative flex flex-col md:flex-row">
@@ -739,14 +733,14 @@ function Travel() {
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+                className="p-8 bg-white/[0.03] border border-white/[0.05] rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-3xl font-bold">Flight Details</h2>
-                    <button onClick={() => setShowFlightDetails(false)} className="text-gray-400 hover:text-white">
+                    <button onClick={() => setShowFlightDetails(false)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
                       <X size={24} />
                     </button>
                   </div>
@@ -916,14 +910,14 @@ function Travel() {
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
-                className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+                className="p-8 bg-white/[0.03] border border-white/[0.05] rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto backdrop-blur-xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-3xl font-bold">Hotel Details</h2>
-                    <button onClick={() => setShowHotelDetails(false)} className="text-gray-400 hover:text-white">
+                    <button onClick={() => setShowHotelDetails(false)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
                       <X size={24} />
                     </button>
                   </div>

@@ -350,50 +350,46 @@ function Marketplace() {
         </div>
       </div>
 
-      {/* Search Bar - Blended Design */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-        <div className="relative flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search for products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  selectedCategory === category
-                    ? 'bg-white/10 border border-white/20 text-white'
-                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+      {/* Search Bar - Seamless Design */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search for products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                selectedCategory === category
+                  ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                  : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Products Grid - Blended Design */}
+      {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
           <motion.div
             key={product.id}
             whileHover={{ y: -8, scale: 1.02 }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 cursor-pointer hover:border-white/20 transition-all group"
+            className="cursor-pointer transition-all group"
             onClick={() => setSelectedProduct(product)}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-white/5 to-white/3 flex items-center justify-center text-6xl">
+              <div className="aspect-square bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-center text-6xl hover:border-white/[0.08] transition-all">
                 {product.image}
               </div>
               <div className="p-5">
@@ -453,7 +449,7 @@ function Marketplace() {
                 <div className="relative p-6">
                   <button
                     onClick={() => setSelectedProduct(null)}
-                    className="absolute top-6 right-6 text-gray-400 hover:text-white z-10"
+                    className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 dark:hover:text-white z-10"
                   >
                     <X size={24} />
                   </button>
@@ -533,7 +529,7 @@ function Marketplace() {
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Shopping Cart</h2>
                   <button onClick={() => setShowCart(false)}>
-                    <X size={24} className="text-gray-400 hover:text-white" />
+                    <X size={24} className="text-gray-400 hover:text-gray-900 dark:hover:text-white" />
                   </button>
                 </div>
 
@@ -610,14 +606,14 @@ function Marketplace() {
                             placeholder="Full Name"
                             value={shippingDetails.name}
                             onChange={(e) => setShippingDetails({ ...shippingDetails, name: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                            className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                           />
                           <input
                             type="text"
                             placeholder="Address"
                             value={shippingDetails.address}
                             onChange={(e) => setShippingDetails({ ...shippingDetails, address: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                            className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                           />
                           <div className="grid grid-cols-2 gap-3">
                             <input
@@ -625,14 +621,14 @@ function Marketplace() {
                               placeholder="City"
                               value={shippingDetails.city}
                               onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
-                              className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                              className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                             />
                             <input
                               type="text"
                               placeholder="State"
                               value={shippingDetails.state}
                               onChange={(e) => setShippingDetails({ ...shippingDetails, state: e.target.value })}
-                              className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                              className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-3">
@@ -641,14 +637,14 @@ function Marketplace() {
                               placeholder="Zip Code"
                               value={shippingDetails.zipCode}
                               onChange={(e) => setShippingDetails({ ...shippingDetails, zipCode: e.target.value })}
-                              className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                              className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                             />
                             <input
                               type="text"
                               placeholder="Phone"
                               value={shippingDetails.phone}
                               onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
-                              className="w-full px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                              className="w-full px-4 py-2.5 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                             />
                           </div>
                         </div>
@@ -689,7 +685,7 @@ function Marketplace() {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold">Order History</h2>
                     <button onClick={() => setShowOrderHistory(false)}>
-                      <X size={24} className="text-gray-400 hover:text-white" />
+                      <X size={24} className="text-gray-400 hover:text-gray-900 dark:hover:text-white" />
                     </button>
                   </div>
                   {orders.length === 0 ? (

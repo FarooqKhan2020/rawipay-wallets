@@ -49,13 +49,13 @@ function Transactions() {
 
   const getTransactionColor = (type: string) => {
     if (type.includes('marketplace') || type.includes('purchase')) {
-      return 'from-purple-500/20 to-purple-400/10'
+      return 'text-purple-400'
     } else if (type.includes('flight')) {
-      return 'from-blue-500/20 to-blue-400/10'
+      return 'text-blue-400'
     } else if (type.includes('utility')) {
-      return 'from-green-500/20 to-green-400/10'
+      return 'text-green-400'
     }
-    return 'from-primary/20 to-primary/10'
+    return 'text-primary'
   }
 
   const filteredTransactions = transactions.filter((tx) => {
@@ -89,8 +89,8 @@ function Transactions() {
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   filter === f
-                    ? 'bg-white/10 border border-white/20 text-white'
-                    : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                    ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                    : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -101,69 +101,64 @@ function Transactions() {
       </div>
 
       {loading ? (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-12 text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-30"></div>
-          <p className="text-gray-400 relative z-10">Loading transactions...</p>
+        <div className="p-12 text-center">
+          <p className="text-gray-400">Loading transactions...</p>
         </div>
       ) : filteredTransactions.length === 0 ? (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-12 text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-30"></div>
-          <p className="text-gray-400 relative z-10">No transactions found</p>
+        <div className="p-12 text-center">
+          <p className="text-gray-400">No transactions found</p>
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-30"></div>
-          <div className="relative divide-y divide-white/5">
-            {filteredTransactions.map((transaction, index) => {
-              const Icon = getTransactionIcon(transaction.type)
-              const isNegative = transaction.amount < 0
-              const colorGradient = getTransactionColor(transaction.type)
+        <div className="divide-y divide-white/[0.02]">
+          {filteredTransactions.map((transaction, index) => {
+            const Icon = getTransactionIcon(transaction.type)
+            const isNegative = transaction.amount < 0
+            const iconColor = getTransactionColor(transaction.type)
 
-              return (
-                <div
-                  key={transaction.id}
-                  className={`p-6 hover:bg-white/5 transition-all duration-200 ${
-                    index === filteredTransactions.length - 1 ? '' : ''
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 bg-gradient-to-br ${colorGradient} rounded-2xl flex items-center justify-center border border-white/10`}>
-                        <Icon size={24} className="text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-base mb-1">{transaction.description}</div>
-                        <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Clock size={14} />
-                            {formatDate(transaction.created_at)} at {formatTime(transaction.created_at)}
-                          </span>
-                          <span className="px-2 py-0.5 bg-white/5 rounded-lg text-xs">
-                            {transaction.type}
-                          </span>
-                        </div>
-                      </div>
+            return (
+              <div
+                key={transaction.id}
+                className={`p-6 hover:bg-white/[0.02] transition-all duration-200 ${
+                  index === filteredTransactions.length - 1 ? '' : ''
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 bg-white/[0.03] rounded-xl flex items-center justify-center border border-white/[0.05]`}>
+                      <Icon size={24} className={iconColor} />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <div className={`text-xl font-bold ${isNegative ? 'text-red-400' : 'text-green-400'}`}>
-                          {isNegative ? '-' : '+'}${Math.abs(transaction.amount).toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          {isNegative ? 'Debit' : 'Credit'}
-                        </div>
+                    <div>
+                      <div className="font-semibold text-base mb-1">{transaction.description}</div>
+                      <div className="flex items-center gap-3 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <Clock size={14} />
+                          {formatDate(transaction.created_at)} at {formatTime(transaction.created_at)}
+                        </span>
+                        <span className="px-2 py-0.5 bg-white/[0.02] border border-white/[0.05] rounded-lg text-xs">
+                          {transaction.type}
+                        </span>
                       </div>
-                      {isNegative ? (
-                        <ArrowDown className="text-red-400" size={20} />
-                      ) : (
-                        <ArrowUp className="text-green-400" size={20} />
-                      )}
                     </div>
                   </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className={`text-xl font-bold ${isNegative ? 'text-red-400' : 'text-green-400'}`}>
+                        {isNegative ? '-' : '+'}${Math.abs(transaction.amount).toFixed(2)}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {isNegative ? 'Debit' : 'Credit'}
+                      </div>
+                    </div>
+                    {isNegative ? (
+                      <ArrowDown className="text-red-400" size={20} />
+                    ) : (
+                      <ArrowUp className="text-green-400" size={20} />
+                    )}
+                  </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

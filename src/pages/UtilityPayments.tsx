@@ -16,10 +16,6 @@ import {
   CheckCircle,
   Smartphone,
   DollarSign,
-  ChevronDown,
-  ChevronUp,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react'
 
 interface Biller {
@@ -51,7 +47,6 @@ function UtilityPayments() {
   const [pendingPayment, setPendingPayment] = useState<{ biller: Biller; amount: number; customerId: string } | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const API_BASE = 'http://localhost:3001/api'
   const walletAddress = wallets[0]?.address || '0xBD77...D599B8'
@@ -101,7 +96,6 @@ function UtilityPayments() {
     setSelectedBiller(biller)
     setCustomerId('')
     setAmount('')
-    setIsCollapsed(true) // Collapse all cards when one is selected
   }
 
   const handleFetchBill = async () => {
@@ -215,7 +209,7 @@ function UtilityPayments() {
 
       {/* Success Message */}
       {paymentSuccess && (
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500/20 to-green-400/10 backdrop-blur-sm border border-green-500/30 p-4 flex items-center gap-3 max-w-2xl">
+        <div className="p-4 flex items-center gap-3 max-w-2xl">
           <CheckCircle className="text-green-400" size={20} />
           <span className="text-green-400">Payment successful! Bill has been paid.</span>
         </div>
@@ -226,65 +220,42 @@ function UtilityPayments() {
         {/* Billers Selection - Left Side */}
         <div className="lg:col-span-2 space-y-6">
           {/* Search and Categories */}
-          {!isCollapsed && (
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6 space-y-4">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search for billers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
-                />
-              </div>
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search for billers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+              />
+            </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
+            <div className="flex items-center gap-2 flex-wrap">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
                     className={`px-4 py-2.5 rounded-xl transition-all text-sm font-medium ${
                       selectedCategory === category
-                        ? 'bg-white/10 border border-white/20 text-white'
-                        : 'bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                        ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                        : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-white'
                     }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
+                >
+                  {category}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* Collapse/Expand Button */}
-          <div className="flex items-center justify-between">
-            {!isCollapsed && <h3 className="text-lg font-semibold">Select Biller</h3>}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className={`flex items-center gap-2 px-4 py-2.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-sm font-medium ${isCollapsed ? 'ml-auto' : ''}`}
-            >
-              {isCollapsed ? (
-                <>
-                  <ChevronRight className="opacity-60" size={16} />
-                  <span>Expand</span>
-                </>
-              ) : (
-                <>
-                  <ChevronLeft className="opacity-60" size={16} />
-                  <span>Collapse</span>
-                </>
-              )}
-            </button>
+          {/* Section Header */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Select Biller</h3>
           </div>
 
           {/* Billers Grid */}
-          <div className={`grid gap-4 transition-all duration-300 ${
-            isCollapsed 
-              ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6' 
-              : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-          }`}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredBillers.map((biller) => {
               const Icon = biller.icon
               const isSelected = selectedBiller?.id === biller.id
@@ -293,33 +264,17 @@ function UtilityPayments() {
                 <button
                   key={biller.id}
                   onClick={() => handleBillerSelect(biller)}
-                  className={`relative overflow-hidden rounded-xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border transition-all ${
-                    isSelected ? 'border-primary/50 shadow-lg shadow-primary/20' : 'border-white/10 hover:border-white/20'
-                  } ${
-                    isCollapsed 
-                      ? 'p-3 flex flex-col items-center justify-center' 
-                      : 'p-4'
-                  }`}
-                  title={isCollapsed ? biller.name : undefined}
+                  className="relative p-4 flex flex-col items-center text-center transition-all hover:scale-105"
                 >
-                  {isSelected && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent"></div>
-                  )}
-                  <div className={`relative rounded-xl flex items-center justify-center ${
-                    isSelected ? 'bg-primary/20' : 'bg-white/5'
-                  } ${
-                    isCollapsed ? 'w-10 h-10' : 'w-12 h-12 mb-3'
-                  } border border-white/10`}>
-                    <Icon className={`${isCollapsed ? 'w-5 h-5' : 'w-6 h-6'} ${isSelected ? 'text-primary' : 'text-gray-400'}`} />
+                  <div className={`relative rounded-xl flex items-center justify-center w-14 h-14 mb-3 transition-all ${
+                    isSelected ? 'bg-primary/20 border border-primary/30' : 'bg-white/[0.02] border border-white/[0.05]'
+                  }`}>
+                    <Icon className={`w-6 h-6 ${isSelected ? 'text-primary' : 'text-gray-400'}`} />
                   </div>
-                  {!isCollapsed && (
-                    <>
-                      <div className={`text-sm font-medium text-left relative ${isSelected ? 'text-white' : 'text-gray-300'}`}>
-                        {biller.name}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1 text-left relative">{biller.category}</div>
-                    </>
-                  )}
+                  <div className={`text-sm font-medium relative ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                    {biller.name}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1 relative">{biller.category}</div>
                 </button>
               )
             })}
@@ -328,20 +283,19 @@ function UtilityPayments() {
 
         {/* Payment Form - Right Side */}
         <div className="lg:col-span-1">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10 p-6 sticky top-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50"></div>
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 relative z-10">
+          <div className="p-6 sticky top-6 space-y-4">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
               <Smartphone className="text-primary" size={20} />
               Pay Bill
             </h3>
 
             {selectedBiller ? (
-              <div className="space-y-4 relative z-10">
+              <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">
                     Biller
                   </label>
-                  <div className="flex items-center gap-2 p-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl">
+                  <div className="flex items-center gap-2 p-3">
                     <selectedBiller.icon className="w-5 h-5 text-primary" />
                     <span className="text-white">{selectedBiller.name}</span>
                   </div>
@@ -356,7 +310,7 @@ function UtilityPayments() {
                     value={customerId}
                     onChange={(e) => setCustomerId(e.target.value)}
                     placeholder="Enter customer ID"
-                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
+                    className="w-full px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                   />
                 </div>
 
@@ -384,7 +338,7 @@ function UtilityPayments() {
                       <label className="block text-sm font-medium text-gray-400 mb-2">
                         Amount Due
                       </label>
-                      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/30 p-5">
+                      <div className="p-5">
                         <div className="text-3xl font-bold text-white mb-1">${parseFloat(amount).toFixed(2)}</div>
                         <div className="text-sm text-gray-400">Payable amount</div>
                       </div>
@@ -415,10 +369,8 @@ function UtilityPayments() {
       {bills.length > 0 && (
         <div className="max-w-7xl mx-auto mt-12">
           <h2 className="text-2xl font-bold mb-6">Recent Bills</h2>
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 via-white/3 to-white/5 backdrop-blur-xl border border-white/10">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/3 via-transparent to-transparent opacity-30"></div>
-            <div className="relative divide-y divide-white/5">
-              <div className="grid grid-cols-5 gap-4 p-4 border-b border-white/10">
+          <div className="divide-y divide-white/[0.02]">
+            <div className="grid grid-cols-5 gap-4 p-4 border-b border-white/[0.05]">
                 <div className="text-sm font-medium text-gray-400">Biller</div>
                 <div className="text-sm font-medium text-gray-400">Customer ID</div>
                 <div className="text-sm font-medium text-gray-400">Amount</div>
@@ -430,7 +382,7 @@ function UtilityPayments() {
                 return (
                   <div
                     key={bill.id}
-                    className={`grid grid-cols-5 gap-4 p-4 hover:bg-white/5 transition-all duration-200 ${
+                    className={`grid grid-cols-5 gap-4 p-4 hover:bg-white/[0.02] transition-all duration-200 ${
                       index === bills.length - 1 ? '' : ''
                     }`}
                   >
@@ -459,7 +411,6 @@ function UtilityPayments() {
                   </div>
                 )
               })}
-            </div>
           </div>
         </div>
       )}

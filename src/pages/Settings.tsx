@@ -67,7 +67,7 @@ function Settings() {
   return (
     <div className="flex h-full min-h-[calc(100vh-80px)] p-6">
       {/* Settings Sidebar */}
-      <div className="w-64 border-r border-dark-border bg-dark-surface">
+      <div className="w-64 border-r border-white/[0.05]">
         <div className="p-6">
           <h1 className="text-2xl font-bold mb-6">Settings</h1>
           <nav className="space-y-1">
@@ -78,10 +78,10 @@ function Settings() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
                     isActive
-                      ? 'bg-primary text-white'
-                      : 'text-gray-400 hover:bg-dark-card hover:text-white'
+                      ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                      : 'text-gray-400 hover:bg-white/[0.02] hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   <Icon size={20} />
@@ -105,14 +105,14 @@ function Settings() {
               <div className="flex gap-3">
                 <button
                   onClick={handleDisconnectAll}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/20 transition-all"
                 >
                   <LogOut size={16} />
                   Disconnect wallets
                 </button>
                 <button
                   onClick={() => setShowAddWallet(!showAddWallet)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white text-dark-bg rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-dark-bg rounded-xl hover:bg-gray-200 transition-all"
                 >
                   <Plus size={16} />
                   Add account
@@ -121,7 +121,7 @@ function Settings() {
             </div>
 
             {showAddWallet && (
-              <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+              <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-xl">
                 <h3 className="text-lg font-semibold mb-4">Add New Wallet</h3>
                 <div className="flex gap-3">
                   <input
@@ -129,11 +129,11 @@ function Settings() {
                     placeholder="Enter wallet address (0x...)"
                     value={newWalletAddress}
                     onChange={(e) => setNewWalletAddress(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary"
+                    className="flex-1 px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-primary/50 transition-all"
                   />
                   <button
                     onClick={handleAddWallet}
-                    className="px-6 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 rounded-xl transition-all"
                   >
                     Connect
                   </button>
@@ -142,7 +142,7 @@ function Settings() {
                       setShowAddWallet(false)
                       setNewWalletAddress('')
                     }}
-                    className="px-6 py-2 bg-dark-surface border border-dark-border rounded-lg hover:bg-dark-bg transition-colors"
+                    className="px-6 py-2 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] transition-all"
                   >
                     Cancel
                   </button>
@@ -151,10 +151,10 @@ function Settings() {
             )}
 
             {/* Accounts Table */}
-            <div className="bg-dark-card border border-dark-border rounded-lg overflow-hidden">
+            <div className="mt-4">
               <table className="w-full">
-                <thead className="bg-dark-surface border-b border-dark-border">
-                  <tr>
+                <thead>
+                  <tr className="border-b border-white/[0.05]">
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Address</th>
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Balance</th>
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Connection</th>
@@ -163,7 +163,7 @@ function Settings() {
                 </thead>
                 <tbody>
                   {wallets.map((wallet) => (
-                    <tr key={wallet.id} className="border-b border-dark-border hover:bg-dark-surface transition-colors">
+                    <tr key={wallet.id} className="border-b border-white/[0.02] hover:bg-white/[0.02] transition-all">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -173,7 +173,7 @@ function Settings() {
                             <span className="font-mono">{formatAddress(wallet.address)}</span>
                             <button
                               onClick={() => copyAddress(wallet.address)}
-                              className="text-gray-400 hover:text-white transition-colors"
+                              className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
                               <Copy size={14} />
                             </button>
@@ -187,8 +187,8 @@ function Settings() {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             wallet.connection === 'Connected'
-                              ? 'bg-green-500/20 text-green-400'
-                              : 'bg-gray-500/20 text-gray-400'
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                              : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                           }`}
                         >
                           {wallet.connection}
@@ -219,13 +219,13 @@ function Settings() {
                 <div className="relative">
                   <button
                     onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                    className="w-full md:w-64 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg flex items-center justify-between hover:border-primary transition-colors"
+                    className="w-full md:w-64 px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-between hover:border-primary/50 transition-all"
                   >
                     <span>{currency}</span>
                     <ChevronDown size={16} />
                   </button>
                   {showCurrencyDropdown && (
-                    <div className="absolute top-full mt-2 w-full md:w-64 bg-dark-surface border border-dark-border rounded-lg shadow-lg z-10">
+                    <div className="absolute top-full mt-2 w-full md:w-64 bg-white/[0.03] border border-white/[0.05] rounded-xl shadow-lg z-10 backdrop-blur-xl">
                       {['USD - US Dollar', 'EUR - Euro', 'GBP - British Pound', 'JPY - Japanese Yen', 'CNY - Chinese Yuan'].map((curr) => (
                         <button
                           key={curr}
@@ -233,7 +233,7 @@ function Settings() {
                             setCurrency(curr)
                             setShowCurrencyDropdown(false)
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-dark-card flex items-center justify-between"
+                          className="w-full px-4 py-2 text-left hover:bg-white/[0.04] flex items-center justify-between transition-all"
                         >
                           <span>{curr}</span>
                           {currency === curr && <Check size={16} className="text-primary" />}
@@ -255,10 +255,10 @@ function Settings() {
                     <button
                       key={th}
                       onClick={() => setAppTheme(th)}
-                      className={`px-6 py-3 rounded-lg border transition-colors ${
+                      className={`px-6 py-3 rounded-xl border transition-all ${
                         appTheme === th
                           ? 'bg-primary border-primary text-white'
-                          : 'bg-dark-surface border-dark-border text-gray-400 hover:border-primary/50'
+                          : 'bg-white/[0.02] border-white/[0.05] text-gray-400 hover:border-primary/50 hover:bg-white/[0.04]'
                       }`}
                     >
                       {displayName}
@@ -275,7 +275,7 @@ function Settings() {
                 <div className="relative">
                   <button
                     onClick={() => setShowIdenticonDropdown(!showIdenticonDropdown)}
-                    className="w-full md:w-64 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg flex items-center justify-between hover:border-primary transition-colors"
+                    className="w-full md:w-64 px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-xl flex items-center justify-between hover:border-primary/50 transition-all"
                   >
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center text-xs font-bold">M</div>
@@ -284,7 +284,7 @@ function Settings() {
                     <ChevronDown size={16} />
                   </button>
                   {showIdenticonDropdown && (
-                    <div className="absolute top-full mt-2 w-full md:w-64 bg-dark-surface border border-dark-border rounded-lg shadow-lg z-10">
+                    <div className="absolute top-full mt-2 w-full md:w-64 bg-white/[0.03] border border-white/[0.05] rounded-xl shadow-lg z-10 backdrop-blur-xl">
                       {['Jazzicon', 'Blockies', 'Maskicon'].map((icon) => (
                         <button
                           key={icon}
@@ -292,7 +292,7 @@ function Settings() {
                             setIdenticon(icon)
                             setShowIdenticonDropdown(false)
                           }}
-                          className="w-full px-4 py-2 text-left hover:bg-dark-card flex items-center justify-between"
+                          className="w-full px-4 py-2 text-left hover:bg-white/[0.04] flex items-center justify-between transition-all"
                         >
                           <span>{icon}</span>
                           {identicon === icon && <Check size={16} className="text-primary" />}
@@ -313,17 +313,17 @@ function Settings() {
               <p className="text-gray-400">Enable or disable networks to load portfolio data for that network.</p>
             </div>
             
-            <div className="bg-dark-card border border-dark-border rounded-lg overflow-hidden">
+            <div className="mt-4">
               <table className="w-full">
-                <thead className="bg-dark-surface border-b border-dark-border">
-                  <tr>
+                <thead>
+                  <tr className="border-b border-white/[0.05]">
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Network</th>
                     <th className="text-left py-3 px-6 text-sm font-medium text-gray-400">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {networks.map((network) => (
-                    <tr key={network.id} className="border-b border-dark-border hover:bg-dark-surface transition-colors">
+                    <tr key={network.id} className="border-b border-white/[0.02] hover:bg-white/[0.02] transition-all">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-xs font-bold">
@@ -334,7 +334,7 @@ function Settings() {
                       </td>
                       <td className="py-4 px-6">
                         {network.default ? (
-                          <span className="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                          <span className="px-3 py-1 bg-primary/20 text-primary border border-primary/30 rounded-full text-xs font-medium">
                             Default
                           </span>
                         ) : (
@@ -367,7 +367,7 @@ function Settings() {
         {activeSection === 'About & Privacy' && (
           <div>
             <h2 className="text-3xl font-bold mb-6">About & Privacy</h2>
-            <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+            <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-xl">
               <p className="text-gray-400">About & Privacy settings coming soon</p>
             </div>
           </div>
@@ -376,7 +376,7 @@ function Settings() {
         {activeSection === 'Notifications' && (
           <div>
             <h2 className="text-3xl font-bold mb-6">Notifications</h2>
-            <div className="bg-dark-card border border-dark-border rounded-lg p-6">
+            <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-xl">
               <p className="text-gray-400">Notification settings coming soon</p>
             </div>
           </div>
@@ -387,4 +387,3 @@ function Settings() {
 }
 
 export default Settings
-

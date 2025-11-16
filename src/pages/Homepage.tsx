@@ -173,13 +173,13 @@ function Homepage() {
             <span className="text-xl font-semibold">Rewi Club</span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="#features" className="text-gray-400 hover:text-white transition-colors hidden md:block">
+            <a href="#features" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
               Features
             </a>
-            <a href="#app" className="text-gray-400 hover:text-white transition-colors hidden md:block">
+            <a href="#app" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
               App
             </a>
-            <a href="#security" className="text-gray-400 hover:text-white transition-colors hidden md:block">
+            <a href="#security" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
               Security
             </a>
             <Link
@@ -923,9 +923,9 @@ function Homepage() {
               <span className="text-xl font-semibold">Rewi Club</span>
             </div>
             <div className="flex gap-8 text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Support</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Terms</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Support</a>
             </div>
           </div>
           <div className="text-center text-gray-500 text-sm">

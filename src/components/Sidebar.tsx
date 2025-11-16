@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, ArrowRightLeft, Compass, FileText, Plane, Settings, Gift, ShoppingBag, Receipt, History, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 function Sidebar() {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const { resolvedTheme } = useTheme()
 
   const menuItems = [
     { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -20,11 +22,11 @@ function Sidebar() {
   ]
 
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-dark-surface border-r border-dark-border flex flex-col transition-all duration-300 relative`}>
+    <div className={`${isCollapsed ? 'w-20' : 'w-64'} border-r border-white/[0.05] flex flex-col transition-all duration-300 relative`}>
       {/* Collapse Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 w-6 h-6 bg-dark-surface border border-dark-border rounded-full flex items-center justify-center hover:bg-dark-card transition-colors z-10"
+        className="absolute -right-3 top-6 w-6 h-6 bg-white/[0.02] border border-white/[0.05] rounded-full flex items-center justify-center hover:bg-white/[0.04] transition-colors z-10"
         title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {isCollapsed ? (
@@ -35,7 +37,7 @@ function Sidebar() {
       </button>
 
       {/* Logo */}
-      <div className={`p-6 border-b border-dark-border ${isCollapsed ? 'px-4' : ''}`}>
+      <div className={`p-6 border-b border-white/[0.05] ${isCollapsed ? 'px-4' : ''}`}>
         <div className="flex items-center gap-3 justify-center">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-xl font-bold">R</span>
@@ -58,8 +60,8 @@ function Sidebar() {
                   to={item.path}
                   className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-lg transition-colors relative group ${
                     isActive
-                      ? 'bg-primary text-white'
-                      : 'text-gray-400 hover:bg-dark-card hover:text-white'
+                      ? 'bg-white/[0.06] text-gray-900 dark:text-white'
+                      : 'text-gray-400 hover:bg-white/[0.02] hover:text-gray-900 dark:hover:text-white'
                   }`}
                   title={isCollapsed ? item.label : undefined}
                 >
@@ -76,7 +78,7 @@ function Sidebar() {
                   )}
                   {/* Tooltip for collapsed state */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-2 px-3 py-2 bg-dark-card border border-dark-border rounded-lg text-white text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                    <div className="absolute left-full ml-2 px-3 py-2 bg-white/[0.03] border border-white/[0.05] backdrop-blur-xl rounded-lg text-white text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
                       {item.label}
                       {item.badge && (
                         <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
@@ -97,7 +99,7 @@ function Sidebar() {
       </nav>
 
       {/* Bottom icon */}
-      <div className={`p-4 border-t border-dark-border ${isCollapsed ? 'px-4' : ''}`}>
+      <div className={`p-4 border-t border-white/[0.05] ${isCollapsed ? 'px-4' : ''}`}>
         <div className={`w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center ${isCollapsed ? 'mx-auto' : ''}`}>
           <span className="text-lg">🦊</span>
         </div>

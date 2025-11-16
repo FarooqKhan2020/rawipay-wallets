@@ -120,24 +120,27 @@ function Discover() {
   ]
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Discover</h1>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-dark-border">
+      <div className="flex gap-6 border-b border-white/[0.05]">
         {tabs.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 px-1 transition-colors ${
+            className={`pb-3 px-1 transition-colors relative ${
               activeTab === tab
-                ? 'border-b-2 border-primary text-white font-medium'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-gray-900 dark:text-white font-medium'
+                : 'text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
             {tab}
+            {activeTab === tab && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-primary to-primary/50 rounded-full"></div>
+            )}
           </button>
         ))}
       </div>
@@ -149,10 +152,10 @@ function Discover() {
             {featuredApps.map((app, i) => (
               <div
                 key={i}
-                className="bg-dark-card border border-dark-border rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer"
+                className="p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl hover:bg-white/[0.04] hover:border-white/[0.08] transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center text-xl">
+                  <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-xl border border-primary/20">
                     {app.logo}
                   </div>
                   <div className="font-semibold">{app.name}</div>
@@ -171,10 +174,10 @@ function Discover() {
                   <button
                     key={filter.id}
                     onClick={() => setActiveFilter(filter.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
                       activeFilter === filter.id
-                        ? 'bg-primary text-white'
-                        : 'bg-dark-card border border-dark-border text-gray-400 hover:text-white'
+                        ? 'bg-white/[0.06] border border-white/[0.1] text-gray-900 dark:text-white'
+                        : 'bg-white/[0.02] border border-white/[0.05] text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
                     <Icon size={16} />
@@ -183,64 +186,62 @@ function Discover() {
                 )
               })}
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-gray-400 hover:text-white">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/[0.05] rounded-xl text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/[0.04] transition-all">
               <span>{selectedNetwork}</span>
               <ChevronDown size={16} />
             </button>
           </div>
 
           {/* Token Table */}
-          <div className="bg-dark-card border border-dark-border rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px]">
-                <thead className="bg-dark-surface border-b border-dark-border">
-                  <tr>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">#</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Token</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Price</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Change (24h)</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Change % (24h)</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Trend (24h)</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Market cap</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">FDV</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Age</th>
+          <div className="mt-4">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/[0.05]">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">#</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Token</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Price</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Change (24h)</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Change % (24h)</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Trend (24h)</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Market cap</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">FDV</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Age</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tokens.map((token) => (
+                  <tr key={token.rank} className="border-b border-white/[0.02] hover:bg-white/[0.02] transition-all">
+                    <td className="py-4 px-4 text-gray-400">{token.rank}</td>
+                    <td className="py-4 px-4">
+                      <div className="font-medium">{token.symbol}</div>
+                      <div className="text-sm text-gray-400">{token.name}</div>
+                    </td>
+                    <td className="py-4 px-4 font-medium">${token.price.toLocaleString()}</td>
+                    <td className={`py-4 px-4 ${token.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {token.change24h >= 0 ? '+' : ''}${token.change24h.toLocaleString()}
+                    </td>
+                    <td className={`py-4 px-4 ${token.changePercent24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {token.changePercent24h >= 0 ? '+' : ''}
+                      {token.changePercent24h.toFixed(2)}%
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className={`w-16 h-8 flex items-center ${token.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                        {token.trend === 'up' ? '📈' : '📉'}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-gray-400">{token.marketCap}</td>
+                    <td className="py-4 px-4 text-gray-400">{token.fdv}</td>
+                    <td className="py-4 px-4 text-gray-400">{token.age}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {tokens.map((token) => (
-                    <tr key={token.rank} className="border-b border-dark-border hover:bg-dark-surface transition-colors">
-                      <td className="py-4 px-4 text-gray-400">{token.rank}</td>
-                      <td className="py-4 px-4">
-                        <div className="font-medium">{token.symbol}</div>
-                        <div className="text-sm text-gray-400">{token.name}</div>
-                      </td>
-                      <td className="py-4 px-4 font-medium">${token.price.toLocaleString()}</td>
-                      <td className={`py-4 px-4 ${token.change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {token.change24h >= 0 ? '+' : ''}${token.change24h.toLocaleString()}
-                      </td>
-                      <td className={`py-4 px-4 ${token.changePercent24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        {token.changePercent24h >= 0 ? '+' : ''}
-                        {token.changePercent24h.toFixed(2)}%
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className={`w-16 h-8 flex items-center ${token.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
-                          {token.trend === 'up' ? '📈' : '📉'}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-gray-400">{token.marketCap}</td>
-                      <td className="py-4 px-4 text-gray-400">{token.fdv}</td>
-                      <td className="py-4 px-4 text-gray-400">{token.age}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         </>
       )}
 
       {activeTab !== 'Tokens' && (
-        <div className="bg-dark-card border border-dark-border rounded-lg p-12 text-center">
+        <div className="p-12 text-center">
           <p className="text-gray-400">{activeTab} content coming soon</p>
         </div>
       )}

@@ -62,7 +62,7 @@ function ConfirmModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >
                   <X size={20} />
                 </button>
