@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
-import { ArrowDown, ShoppingBag, Plane, Receipt, Filter } from 'lucide-react'
+import { ArrowDown, ArrowUp, Clock, ShoppingBag, Plane, Receipt, Filter } from 'lucide-react'
 
 interface Transaction {
   id: number
