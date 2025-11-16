@@ -1,12 +1,25 @@
-import { Search, Bell, Play, Plus, Sun, Moon, Monitor } from 'lucide-react'
+import { Search, Bell, Play, Plus, Sun, Moon, Menu } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
-function Header() {
+interface HeaderProps {
+  onMenuToggle: () => void
+}
+
+function Header({ onMenuToggle }: HeaderProps) {
   const { theme, setTheme, resolvedTheme } = useTheme()
   return (
     <div className="bg-dark-surface border-b border-dark-border p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex-1 max-w-md">
+      <div className="flex items-center justify-between gap-4">
+        {/* Mobile menu button */}
+        <button 
+          onClick={onMenuToggle}
+          className="md:hidden text-gray-400 hover:text-white"
+        >
+          <Menu size={24} />
+        </button>
+
+        {/* Search - hidden on small mobile, shown on larger screens */}
+        <div className="flex-1 max-w-md hidden sm:block">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -16,8 +29,10 @@ function Header() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+        
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Notification icons - hidden on very small screens */}
+          <div className="hidden sm:flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm font-semibold">
               2
             </div>
@@ -45,9 +60,10 @@ function Header() {
             </button>
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors">
+          {/* Add account button - text hidden on small screens */}
+          <button className="flex items-center gap-2 px-3 md:px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors">
             <Plus size={20} />
-            <span>Add an account</span>
+            <span className="hidden md:inline">Add an account</span>
           </button>
         </div>
       </div>
