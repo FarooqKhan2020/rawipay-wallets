@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext'
 function Sidebar() {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const { } = useTheme()
+  const { theme } = useTheme()
 
   const menuItems = [
     { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -39,12 +39,16 @@ function Sidebar() {
       {/* Logo */}
       <div className={`p-6 border-b border-white/[0.05] ${isCollapsed ? 'px-4' : ''}`}>
         <div className="flex items-center gap-3 justify-center">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-xl font-bold">R</span>
-          </div>
-          {!isCollapsed && (
-            <span className="text-xl font-semibold whitespace-nowrap">Rewi Club</span>
-          )}
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src={theme === 'dark' ? '/logo.png' : '/log2.png'}
+              alt="Rewi Club"
+              className={`h-10 w-auto transition-transform group-hover:scale-110 ${isCollapsed ? 'h-8' : 'h-10'}`}
+            />
+            {/* {!isCollapsed && (
+              <span className="text-xl font-semibold whitespace-nowrap">Rewi Club</span>
+            )} */}
+          </Link>
         </div>
       </div>
 

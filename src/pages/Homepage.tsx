@@ -1,6 +1,8 @@
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
+import HomeNavbar from '../components/HomeNavbar'
+import HomeFooter from '../components/HomeFooter'
 import {
   ArrowRight,
   Shield,
@@ -148,43 +150,7 @@ function Homepage() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-white overflow-hidden">
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        className="fixed top-0 w-full z-50 bg-dark-bg/80 backdrop-blur-xl border-b border-dark-border"
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <motion.div
-              whileHover={{ rotate: 360, scale: 1.1 }}
-              transition={{ duration: 0.6 }}
-              className="w-10 h-10 bg-white rounded-lg flex items-center justify-center"
-            >
-              <span className="text-xl font-bold text-black">R</span>
-            </motion.div>
-            <span className="text-xl font-semibold">Rewi Club</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <a href="#features" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
-              Features
-            </a>
-            <a href="#app" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
-              App
-            </a>
-            <a href="#security" className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden md:block">
-              Security
-            </a>
-            <Link
-              to="/app/dashboard"
-              className="px-6 py-2 bg-white text-black rounded-lg hover:bg-gray-200 transition-all font-medium"
-            >
-              Launch App
-            </Link>
-          </div>
-        </div>
-      </motion.nav>
+      <HomeNavbar />
 
       {/* Hero Section */}
       <motion.section
@@ -906,27 +872,7 @@ function Homepage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-dark-border py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-xl font-bold text-black">R</span>
-              </div>
-              <span className="text-xl font-semibold">Rewi Club</span>
-            </div>
-            <div className="flex gap-8 text-gray-400">
-              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-gray-900 dark:hover:text-white transition-colors">Support</a>
-            </div>
-          </div>
-          <div className="text-center text-gray-500 text-sm">
-            © 2024 Rewi Club. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <HomeFooter />
     </div>
   )
 }
