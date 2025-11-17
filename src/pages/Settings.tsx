@@ -60,9 +60,10 @@ function Settings() {
     navigator.clipboard.writeText(address)
   }
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-6)}`
-  }
+  const formatAddress = (address?: string) => {
+  if (!address) return "N/A"
+  return `${address.slice(0, 6)}...${address.slice(-6)}`
+}
 
   return (
     <div className="flex h-full min-h-[calc(100vh-80px)] p-6">
@@ -181,7 +182,7 @@ function Settings() {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <span className="font-semibold">${wallet.balance.toFixed(2)}</span>
+                        <span className="font-semibold">${(wallet.balance ?? 0).toFixed(2)}</span>
                       </td>
                       <td className="py-4 px-6">
                         <span

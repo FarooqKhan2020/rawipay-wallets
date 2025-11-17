@@ -7,6 +7,7 @@ interface Wallet {
   balance: number
   connection: 'Connected' | 'Disconnected'
   network: string
+  connector?: string
 }
 
 const API_BASE = 'http://localhost:3001/api'

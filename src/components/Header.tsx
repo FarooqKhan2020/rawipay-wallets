@@ -1,51 +1,99 @@
-import { Search, Bell, Play, Plus, Sun, Moon, Wallet, X, ChevronDown } from 'lucide-react'
+import { Search, Bell, Play, Plus, Sun, Moon, Wallet, X, ChevronDown, ArrowRight, Trash2, LogOut, Check } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 import { useAppKit } from '@reown/appkit/react'
-import { useAccount, useDisconnect } from 'wagmi'
-import { useState } from 'react'
+import { useAccount, useDisconnect, useConnect } from 'wagmi'
+import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
 
 function Header() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const { open } = useAppKit()
-  const { address, isConnected } = useAccount()
+  const { address, connector: currentConnector } = useAccount()
   const { disconnect } = useDisconnect()
-  const { wallets, addWallet, removeWallet, disconnectWallet } = useApp()
+  const { connect, connectors } = useConnect()
+  const { wallets, addWallet, removeWallet } = useApp()
   const [showWalletDrawer, setShowWalletDrawer] = useState(false)
+
+  // Add wallet to list when new address connects
+  useEffect(() => {
+    if (address && currentConnector) {
+      const walletExists = wallets.find(w => w.address.toLowerCase() === address.toLowerCase())
+      if (!walletExists) {
+        const connectorName = currentConnector.name || 'Unknown'
+        const newWallet = {
+          id: Date.now().toString(),
+          address,
+          balance: 0,
+          connection: 'Connected' as const,
+          network: 'Ethereum',
+          connector: connectorName,
+        }
+        addWallet(newWallet)
+      }
+    }
+  }, [address, currentConnector])
 
   const handleConnectWallet = () => {
     open()
   }
 
   const handleAddWallet = async () => {
-    if (address && !wallets.find(w => w.address === address)) {
-      addWallet(address)
+    // Disconnect current wallet first so user can choose a different connector
+    if (address) {
+      disconnect()
+      // Give the disconnect time to process before opening modal
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
+    // Show Reown wallet selection modal immediately after disconnect completes
     open()
   }
 
-  const handleSwitchWallet = () => {
-    open({ view: 'Account' })
+  const handleSwitchWallet = (walletAddress: string) => {
+    // Find the wallet to switch to
+    const wallet = wallets.find(w => w.address.toLowerCase() === walletAddress.toLowerCase())
+    if (wallet) {
+      // Find the connector that matches this wallet's connector name
+      const matchingConnector = connectors.find(c => c.name === wallet.connector)
+      
+      if (matchingConnector) {
+        // Connect using the matching connector
+        connect({ connector: matchingConnector })
+        setShowWalletDrawer(false)
+      } else {
+        // Fallback: open AppKit to manually select
+        open({ view: 'Account' })
+        setShowWalletDrawer(false)
+      }
+    }
   }
 
-  const handleRemoveWallet = (walletAddress: string) => {
-    removeWallet(walletAddress)
-    if (address === walletAddress) {
+  const handleRemoveWallet = (walletId: string) => {
+    const walletToRemove = wallets.find(w => w.id === walletId)
+    removeWallet(walletId)
+    
+    // If removing the currently active wallet, disconnect
+    if (walletToRemove && address === walletToRemove.address) {
       disconnect()
     }
   }
 
   const handleClearAllWallets = () => {
     wallets.forEach(wallet => {
-      disconnectWallet(wallet.address)
+      removeWallet(wallet.id)
     })
     disconnect()
     setShowWalletDrawer(false)
   }
 
-  const formatAddress = (addr: string) => {
+  const formatAddress = (addr?: string) => {
+    if (!addr) return "N/A"
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`
   }
+
+  const isActiveWallet = (walletAddress: string) => {
+    return address && address.toLowerCase() === walletAddress.toLowerCase()
+  }
+
 
   return (
     <div className="border-b border-white/[0.05] p-4">
@@ -68,7 +116,7 @@ function Header() {
             <Bell className="text-gray-400" size={20} />
             <Play className="text-gray-400" size={20} />
           </div>
-          
+
           {/* Theme Toggle */}
           <div className="relative">
             <button
@@ -89,97 +137,138 @@ function Header() {
             </button>
           </div>
 
-          {!isConnected ? (
-            <button 
-              onClick={handleConnectWallet}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors"
-            >
-              <Wallet size={20} />
-              <span>Connect Wallet</span>
-            </button>
-          ) : (
+          {/* Wallet Button */}
+          {wallets.length > 0 ? (
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowWalletDrawer(!showWalletDrawer)}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                <Wallet size={20} />
-                <span>{formatAddress(address!)}</span>
-                <ChevronDown size={16} />
+                <Wallet size={18} />
+                <span className="text-sm font-medium">
+                  {wallets.length} {wallets.length === 1 ? 'Wallet' : 'Wallets'}
+                </span>
+                <ChevronDown size={16} className={`transition-transform duration-300 ${showWalletDrawer ? 'rotate-180' : ''}`} />
               </button>
 
               {showWalletDrawer && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
+                  <div
+                    className="fixed inset-0 z-40 bg-black/30 dark:bg-black/50 backdrop-blur-sm"
                     onClick={() => setShowWalletDrawer(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-80 bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-                    <div className="p-4 border-b border-border">
+                  <div className="absolute right-0 mt-2 w-96 bg-background border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                    {/* Header */}
+                    <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/0">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-foreground">Connected Wallets</h3>
-                        <button 
+                        <div>
+                          <h3 className="font-semibold text-foreground text-base">Connected Wallets</h3>
+                          <p className="text-xs text-muted-foreground mt-1">{wallets.length} wallet{wallets.length !== 1 ? 's' : ''} connected</p>
+                        </div>
+                        <button
                           onClick={() => setShowWalletDrawer(false)}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-foreground hover:bg-white/10 p-1.5 rounded-lg transition-colors"
                         >
                           <X size={18} />
                         </button>
                       </div>
                     </div>
 
-                    <div className="max-h-64 overflow-y-auto">
-                      {wallets.map((wallet) => (
-                        <div 
-                          key={wallet.address}
-                          className={`p-3 flex items-center justify-between hover:bg-muted/50 ${
-                            wallet.address === address ? 'bg-muted' : ''
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                              <Wallet size={16} className="text-primary" />
+                    {/* Wallets List */}
+                    <div className="max-h-[320px] overflow-y-auto">
+                      <div className="space-y-1 p-2">
+                        {wallets.map((wallet) => (
+                          <div
+                            key={wallet.id}
+                            onClick={() => {
+                              // If this is the already-active wallet, open account modal (w3m-like card)
+                              if (isActiveWallet(wallet.address)) {
+                                open({ view: 'Account' })
+                                setShowWalletDrawer(false)
+                              }
+                            }}
+                            className={`p-3 flex items-center justify-between rounded-lg transition-all duration-200 group ${
+                              isActiveWallet(wallet.address)
+                                ? 'bg-primary/10 border border-primary/30 ring-1 ring-primary/20'
+                                : 'bg-white/2 border border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                            }`}>
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="relative flex-shrink-0">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                  isActiveWallet(wallet.address)
+                                    ? 'bg-primary/20'
+                                    : 'bg-white/5 group-hover:bg-white/10'
+                                } transition-colors`}>
+                                  <Wallet size={16} className={isActiveWallet(wallet.address) ? 'text-primary' : 'text-muted-foreground'} />
+                                </div>
+                                {isActiveWallet(wallet.address) && (
+                                  <div className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5 shadow-sm">
+                                    <Check size={12} className="text-primary-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <code className="text-xs font-mono block truncate text-foreground">{formatAddress(wallet.address)}</code>
+                                    {isActiveWallet(wallet.address) && (
+                                      <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded whitespace-nowrap">
+                                        Active
+                                      </span>
+                                    )}
+                                  </div>
+                                  {wallet.connector && (
+                                    <p className="text-xs text-muted-foreground mt-0.5">{wallet.connector}</p>
+                                  )}
+                                  <p className="text-xs text-muted-foreground mt-0.5">{(wallet.balance ?? 0).toFixed(4)} ETH</p>
+                                </div>
                             </div>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">
-                                {formatAddress(wallet.address)}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {wallet.balance.toFixed(4)} ETH
-                              </p>
+                            <div className="flex items-center gap-1 flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {!isActiveWallet(wallet.address) && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleSwitchWallet(wallet.address)
+                                  }}
+                                  className="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                  title="Switch to this wallet"
+                                >
+                                  <ArrowRight size={14} />
+                                </button>
+                              )}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleRemoveWallet(wallet.id)
+                                }}
+                                className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                                title="Remove wallet"
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
                           </div>
-                          {wallet.address === address && (
-                            <span className="text-xs text-primary font-medium">Active</span>
-                          )}
-                          <button
-                            onClick={() => handleRemoveWallet(wallet.address)}
-                            className="ml-2 text-muted-foreground hover:text-destructive"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="p-3 border-t border-border space-y-2">
+                    {/* Footer Actions */}
+                    <div className="p-3 border-t border-border space-y-2 bg-white/[0.02]">
                       <button
-                        onClick={handleAddWallet}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg transition-colors text-primary-foreground"
+                        onClick={() => {
+                          handleAddWallet()
+                          setShowWalletDrawer(false)
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 text-white rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md"
                       >
-                        <Plus size={18} />
-                        <span>Add Wallet</span>
+                        <Plus size={16} />
+                        <span>Add Another Wallet</span>
                       </button>
-                      <button
-                        onClick={handleSwitchWallet}
-                        className="w-full px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-foreground"
-                      >
-                        Switch Wallet
-                      </button>
-                      {wallets.length > 0 && (
+                      {wallets.length > 1 && (
                         <button
                           onClick={handleClearAllWallets}
-                          className="w-full px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg transition-colors"
+                          className="w-full px-4 py-2.5 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg transition-colors font-medium text-sm border border-destructive/20"
                         >
+                          <LogOut size={16} className="inline mr-2" />
                           Clear All Wallets
                         </button>
                       )}
@@ -188,6 +277,14 @@ function Header() {
                 </>
               )}
             </div>
+          ) : (
+            <button
+              onClick={handleConnectWallet}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary/70 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+            >
+              <Wallet size={20} />
+              <span>Connect Wallet</span>
+            </button>
           )}
         </div>
       </div>
