@@ -157,9 +157,9 @@ function Header() {
                     className="fixed inset-0 z-40 bg-black/30 dark:bg-black/50 backdrop-blur-sm"
                     onClick={() => setShowWalletDrawer(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-96 bg-background border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
                     {/* Header */}
-                    <div className="p-4 border-b border-border bg-gradient-to-r from-primary/5 to-primary/0">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-primary/5 to-primary/0">
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="font-semibold text-foreground text-base">Connected Wallets</h3>
@@ -190,14 +190,14 @@ function Header() {
                             className={`p-3 flex items-center justify-between rounded-lg transition-all duration-200 group ${
                               isActiveWallet(wallet.address)
                                 ? 'bg-primary/10 border border-primary/30 ring-1 ring-primary/20'
-                                : 'bg-white/2 border border-white/5 hover:bg-white/[0.05] hover:border-white/10'
+                                : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-750'
                             }`}>
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               <div className="relative flex-shrink-0">
                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                   isActiveWallet(wallet.address)
                                     ? 'bg-primary/20'
-                                    : 'bg-white/5 group-hover:bg-white/10'
+                                    : 'bg-gray-200 dark:bg-gray-700 group-hover:bg-gray-300 dark:group-hover:bg-gray-600'
                                 } transition-colors`}>
                                   <Wallet size={16} className={isActiveWallet(wallet.address) ? 'text-primary' : 'text-muted-foreground'} />
                                 </div>
@@ -252,7 +252,7 @@ function Header() {
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="p-3 border-t border-border space-y-2 bg-white/[0.02]">
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-700 space-y-2 bg-gray-50 dark:bg-gray-800">
                       <button
                         onClick={() => {
                           handleAddWallet()
