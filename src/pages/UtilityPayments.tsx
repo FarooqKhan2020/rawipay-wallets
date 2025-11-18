@@ -18,6 +18,7 @@ import {
   Home,
   Shield,
   ArrowLeft,
+  Wallet,
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -50,6 +51,7 @@ interface BillVerification {
 
 const API_TOKEN = 'tQNo599kUDOCtYp4Jm40dzVIYUFglSTUMiHCHql1X6IhdVFLqVIL3kt8XYsp'
 const API_BASE = 'https://auth.scrizapay.in/api'
+const OPERATOR_VERIFY_API_KEY = 'aac4555e0b9fe22de53100f513b4df683b1d1ba52d17f7d24a'
 
 const SERVICE_CATEGORIES = [
   { id: 1, name: 'Mobile Recharge', icon: Smartphone, category: 'Telecom' },
@@ -90,17 +92,19 @@ function UtilityPayments() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [step, setStep] = useState<'service' | 'provider' | 'form' | 'payment'>('service')
-  
+  const [step, setStep] = useState<'service' | 'provider' | 'form' | 'plans' | 'payment'>('service')
+
   // Form fields
   const [number, setNumber] = useState('')
   const [amount, setAmount] = useState('')
   const [validationParams, setValidationParams] = useState<ValidationParam[]>([])
   const [optionalFields, setOptionalFields] = useState<Record<string, string>>({})
   const [billDetails, setBillDetails] = useState<BillVerification | null>(null)
+  const [operatorDetails, setOperatorDetails] = useState<{ operatorName: string; stateName: string } | null>(null)
+  const [verifyingOperator, setVerifyingOperator] = useState(false)
 
   const walletAddress = wallets[0]?.address || '0x0000000000000000000000000000000000000000'
-  
+
   // Check if service is simple telecom (only needs number and amount)
   const isSimpleTelecom = selectedProvider && [1, 2, 3, 4].includes(selectedProvider.service_id)
 
@@ -134,6 +138,15 @@ function UtilityPayments() {
     }
   }, [selectedProvider])
 
+  // Verify operator details when 10-digit mobile number is entered
+  useEffect(() => {
+    if (isSimpleTelecom && [1, 3].includes(selectedProvider?.service_id || 0) && number.length === 10 && /^\d{10}$/.test(number)) {
+      verifyMobileOperator()
+    } else if (number.length < 10) {
+      setOperatorDetails(null)
+    }
+  }, [number, selectedProvider, isSimpleTelecom])
+
   const fetchProviders = async () => {
     setLoading(true)
     try {
@@ -144,7 +157,7 @@ function UtilityPayments() {
         method: 'POST',
         body: formData,
       })
-      
+
       const data = await response.json()
       if (data.status === 'success') {
         setProviders(data.providers)
@@ -158,7 +171,7 @@ function UtilityPayments() {
 
   const fetchProviderValidation = async () => {
     if (!selectedProvider) return
-    
+
     setLoading(true)
     try {
       const formData = new FormData()
@@ -181,6 +194,43 @@ function UtilityPayments() {
     }
   }
 
+  const verifyMobileOperator = async () => {
+    if (!number || number.length !== 10) return
+
+    setVerifyingOperator(true)
+    try {
+      const response = await fetch('https://verifyapi.in/api/verifyOperatorDetail', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': OPERATOR_VERIFY_API_KEY,
+        },
+        body: JSON.stringify({ serviceNumber: number }),
+      })
+
+      const raw = await response.text()
+      let data
+      try {
+        data = JSON.parse(raw)
+      } catch (e) {
+        console.warn('verifyOperator: response is not JSON', e)
+        data = { raw }
+      }
+      console.log('parsed data123', data)
+      if (data.data.operatorName && data.data.stateName) {
+        setOperatorDetails({
+          operatorName: data.data.operatorName,
+          stateName: data.data.stateName,
+        })
+      }
+    } catch (err) {
+      console.error('Failed to verify operator:', err)
+    } finally {
+      setVerifyingOperator(false)
+    }
+  }
+
   const handleServiceSelect = (serviceId: number) => {
     setSelectedService(serviceId)
     setStep('provider')
@@ -195,6 +245,7 @@ function UtilityPayments() {
     setAmount('')
     setOptionalFields({})
     setBillDetails(null)
+    setOperatorDetails(null)
     setError('')
   }
 
@@ -214,7 +265,7 @@ function UtilityPayments() {
       const formDataObj = new FormData()
       formDataObj.append('api_token', API_TOKEN)
       formDataObj.append('provider_id', selectedProvider.provider_id.toString())
-      
+
       Object.keys(optionalFields).forEach(key => {
         if (optionalFields[key]) {
           formDataObj.append(key, optionalFields[key])
@@ -268,7 +319,7 @@ function UtilityPayments() {
       if (data.status === 'success') {
         setSuccess(data.message)
         updateSpending(parseFloat(amount))
-        
+
         // Reset form
         setTimeout(() => {
           setStep('service')
@@ -325,7 +376,7 @@ function UtilityPayments() {
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="mb-8 md:mb-12">
-          
+
             <h1 className="text-3xl font-bold mb-4 text-foreground">
               Utility Payments
             </h1>
@@ -354,7 +405,7 @@ function UtilityPayments() {
 
           {/* Service Selection */}
           {step === 'service' && (
-            <div>  
+            <div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5 animate-fade-in">
                 {SERVICE_CATEGORIES.map((service, index) => {
                   const Icon = service.icon
@@ -367,7 +418,7 @@ function UtilityPayments() {
                     >
                       {/* Animated gradient background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      
+
                       {/* Shine effect */}
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                         <div className="absolute top-0 -left-full h-full w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 group-hover:animate-[slide-in-right_0.8s_ease-out]" />
@@ -455,7 +506,7 @@ function UtilityPayments() {
                       >
                         {/* Animated gradient background */}
                         <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
+
                         {/* Shine effect */}
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                           <div className="absolute top-0 -left-full h-full w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12 group-hover:animate-[slide-in-right_0.8s_ease-out]" />
@@ -488,8 +539,8 @@ function UtilityPayments() {
                   })
                 )}
               </div>
-          </div>
-        )}
+            </div>
+          )}
 
           {/* Form Step */}
           {step === 'form' && selectedProvider && (
@@ -498,11 +549,11 @@ function UtilityPayments() {
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -z-10" />
-                
+
                 <div className="flex items-center gap-4 pb-6 border-b-2 border-border/50">
-                  <Button 
-                    variant="ghost" 
-                    onClick={goBackToProviders} 
+                  <Button
+                    variant="ghost"
+                    onClick={goBackToProviders}
                     className="hover:bg-primary/10 rounded-xl transition-all duration-300 hover:scale-105"
                   >
                     <ArrowLeft className="h-5 w-5" />
@@ -522,9 +573,9 @@ function UtilityPayments() {
                     <div className="group">
                       <label className="block text-base md:text-lg font-bold mb-3 text-foreground flex items-center gap-2">
                         <Phone className="h-5 w-5 text-primary" />
-                        {selectedProvider.service_id === 1 ? 'Mobile Number' : 
-                         selectedProvider.service_id === 2 ? 'Customer ID' :
-                         selectedProvider.service_id === 3 ? 'Mobile Number' : 'Account Number'}
+                        {selectedProvider.service_id === 1 ? 'Mobile Number' :
+                          selectedProvider.service_id === 2 ? 'Customer ID' :
+                            selectedProvider.service_id === 3 ? 'Mobile Number' : 'Account Number'}
                       </label>
                       <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
@@ -535,6 +586,22 @@ function UtilityPayments() {
                           className="relative h-14 bg-background/70 backdrop-blur-sm border-2 border-border/50 focus:border-primary/60 rounded-xl text-base shadow-lg transition-all duration-300"
                         />
                       </div>
+                      {verifyingOperator && (
+                        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                          Verifying operator...
+                        </div>
+                      )}
+                      {operatorDetails && !verifyingOperator && (
+                        <div className="mt-2 p-2 md:p-2 bg-gradient-to-br from-green-500/10 to-green-500/5 border-2 border-green-500/30 rounded-xl space-y-1 mx-1 cursor-pointer">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">{operatorDetails.operatorName}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-muted-foreground">{operatorDetails.stateName}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="group">
                       <label className="block text-base md:text-lg font-bold mb-3 text-foreground flex items-center gap-2">
@@ -550,6 +617,25 @@ function UtilityPayments() {
                           placeholder="Enter amount"
                           className="relative h-14 bg-background/70 backdrop-blur-sm border-2 border-border/50 focus:border-primary/60 rounded-xl text-base shadow-lg transition-all duration-300"
                         />
+                      </div>
+                    </div>
+
+                    <div className="group">
+                      <label className="block text-base md:text-lg font-bold mb-3 text-foreground flex items-center gap-2">
+                        <Wallet className="h-5 w-5 text-primary" />
+                        Select Wallet
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
+                        <select
+                          className="relative w-full h-14 bg-white dark:bg-black text-foreground px-4 py-3 text-base rounded-xl border-2 border-border/50 focus:border-primary/60 shadow-lg transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
+                          defaultValue={wallets[0]?.address || ''}
+                        >
+                          {wallets.map((wallet) => (
+                            <option key={wallet.address} value={wallet.address}>{wallet.connector}</option>
+                          ))}
+                        </select>
+                        <Wallet className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary pointer-events-none" />
                       </div>
                     </div>
 
@@ -611,9 +697,38 @@ function UtilityPayments() {
                     </Button>
                   </div>
                 )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {step === 'plans' && selectedProvider && (
+            <div className="max-w-md mx-auto animate-fade-in">
+              <div className="relative bg-card/80 backdrop-blur-xl border-2 border-border/50 rounded-3xl p-6 md:p-10 space-y-6 shadow-2xl overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -z-10" />
+
+                <div className="flex items-center gap-4 pb-6 border-b-2 border-border/50">
+                  <Button
+                    variant="ghost"
+                    onClick={goBackToProviders}
+                    className="hover:bg-primary/10 rounded-xl transition-all duration-300 hover:scale-105"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <div className="flex-1">
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">{selectedProvider.provider_name}</h2>
+                    <p className="text-sm md:text-base text-muted-foreground mt-1 flex items-center gap-2">
+                      <span className="inline-block w-2 h-2 bg-primary rounded-full animate-pulse" />
+                      {selectedProvider.service_name}
+                    </p>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          )}
 
           {/* Payment Confirmation */}
           {step === 'payment' && selectedProvider && billDetails && (
@@ -622,7 +737,7 @@ function UtilityPayments() {
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 animate-pulse" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -z-10 animate-pulse" style={{ animationDelay: '1s' }} />
-                
+
                 <div className="text-center pb-6 border-b-2 border-border/50">
                   <div className="relative inline-block mb-6">
                     <div className="absolute inset-0 bg-green-500/30 rounded-full blur-2xl animate-pulse" />

@@ -154,7 +154,7 @@ function Header() {
               {showWalletDrawer && (
                 <>
                   <div
-                    className="fixed inset-0 z-40 bg-black/30 dark:bg-black/50 backdrop-blur-sm"
+                    className="fixed inset-0 z-40 bg-black/30 dark:bg-black/50"
                     onClick={() => setShowWalletDrawer(false)}
                   />
                   <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
