@@ -324,14 +324,12 @@ function UtilityPayments() {
       <div className="relative z-10 p-4 md:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="mb-8 md:mb-12 text-center">
-            <div className="inline-block mb-4 p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm animate-scale-in">
-              <DollarSign className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-foreground">
+          <div className="mb-8 md:mb-12">
+          
+            <h1 className="text-3xl font-bold mb-4 text-foreground">
               Utility Payments
             </h1>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-base md:text-lg">
               Pay your bills quickly and securely with cryptocurrency. Simple, fast, and convenient.
             </p>
           </div>
@@ -356,11 +354,7 @@ function UtilityPayments() {
 
           {/* Service Selection */}
           {step === 'service' && (
-            <div>
-              <div className="mb-6 text-center">
-                <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-2">Select Service</h2>
-                <p className="text-sm text-muted-foreground">Choose the type of bill you want to pay</p>
-              </div>
+            <div>  
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5 animate-fade-in">
                 {SERVICE_CATEGORIES.map((service, index) => {
                   const Icon = service.icon
