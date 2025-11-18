@@ -314,49 +314,54 @@ function UtilityPayments() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">
             Utility Payments
           </h1>
-          <p className="text-muted-foreground">Pay your bills quickly and securely</p>
+          <p className="text-muted-foreground text-base md:text-lg">Pay your bills quickly and securely with crypto</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-destructive" />
-            <p className="text-destructive">{error}</p>
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            <div className="p-2 rounded-full bg-destructive/20">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+            </div>
+            <p className="text-destructive font-medium">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <p className="text-green-500">{success}</p>
+          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-3 backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+            <div className="p-2 rounded-full bg-green-500/20">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+            </div>
+            <p className="text-green-500 font-medium">{success}</p>
           </div>
         )}
 
         {/* Service Selection */}
         {step === 'service' && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-6">
             {SERVICE_CATEGORIES.map((service) => {
               const Icon = service.icon
               return (
                 <button
                   key={service.id}
                   onClick={() => handleServiceSelect(service.id)}
-                  className="group p-6 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  className="group relative p-5 md:p-6 bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-1 hover:bg-card overflow-hidden"
                 >
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Icon className="h-6 w-6 text-primary" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative flex flex-col items-center gap-3 md:gap-4">
+                    <div className="p-3 md:p-4 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300 group-hover:scale-110">
+                      <Icon className="h-6 w-6 md:h-7 md:w-7 text-primary" />
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      <div className="font-semibold text-sm md:text-base text-foreground group-hover:text-primary transition-colors">
                         {service.name}
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="text-xs text-muted-foreground mt-1 opacity-80">
                         {service.category}
                       </div>
                     </div>
@@ -369,37 +374,42 @@ function UtilityPayments() {
 
         {/* Provider Selection */}
         {step === 'provider' && (
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
+          <div className="space-y-6 md:space-y-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
               <Button
                 variant="ghost"
                 onClick={resetToServiceSelection}
-                className="flex items-center gap-2"
+                className="flex items-center justify-center gap-2 hover:bg-primary/10"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     placeholder="Search providers..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-card border-border"
+                    className="pl-12 h-12 bg-card/50 backdrop-blur-sm border-border/50 focus:border-primary/50 rounded-xl"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5">
               {loading ? (
-                <div className="col-span-full flex justify-center items-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="col-span-full flex flex-col justify-center items-center py-20">
+                  <Loader2 className="h-10 w-10 md:h-12 md:w-12 animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Loading providers...</p>
                 </div>
               ) : filteredProviders.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  No providers found
+                <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+                  <div className="p-4 rounded-full bg-muted/50 mb-4">
+                    <AlertCircle className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                  <p className="text-lg font-medium text-foreground mb-2">No providers found</p>
+                  <p className="text-sm text-muted-foreground">Try adjusting your search</p>
                 </div>
               ) : (
                 filteredProviders.map((provider) => {
@@ -408,21 +418,24 @@ function UtilityPayments() {
                     <button
                       key={provider.provider_id}
                       onClick={() => handleProviderSelect(provider)}
-                      className="group p-4 bg-card border border-border rounded-xl hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                      className="group relative p-4 md:p-5 bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
                     >
-                      <div className="flex flex-col items-center gap-3">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="relative flex flex-col items-center gap-3 md:gap-4">
                         {provider.provider_icon && provider.provider_icon !== 'https://cdn.mroa.in/' ? (
-                          <img
-                            src={provider.provider_icon}
-                            alt={provider.provider_name}
-                            className="h-12 w-12 object-contain"
-                          />
+                          <div className="h-14 w-14 md:h-16 md:w-16 rounded-xl bg-background/50 backdrop-blur-sm p-2 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <img
+                              src={provider.provider_icon}
+                              alt={provider.provider_name}
+                              className="h-full w-full object-contain"
+                            />
+                          </div>
                         ) : (
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Icon className="h-8 w-8 text-primary" />
+                          <div className="p-3 md:p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-primary/20 group-hover:to-primary/10 group-hover:scale-110 transition-all duration-300">
+                            <Icon className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                           </div>
                         )}
-                        <div className="text-sm font-medium text-center text-foreground group-hover:text-primary transition-colors">
+                        <div className="text-sm md:text-base font-medium text-center text-foreground group-hover:text-primary transition-colors line-clamp-2">
                           {provider.provider_name}
                         </div>
                       </div>
@@ -436,23 +449,23 @@ function UtilityPayments() {
 
         {/* Form Step */}
         {step === 'form' && selectedProvider && (
-          <div className="max-w-xl mx-auto">
-            <div className="bg-card border border-border rounded-xl p-6 space-y-6">
-              <div className="flex items-center gap-4 pb-4 border-b border-border">
-                <Button variant="ghost" onClick={goBackToProviders}>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+              <div className="flex items-center gap-4 pb-6 border-b border-border/50">
+                <Button variant="ghost" onClick={goBackToProviders} className="hover:bg-primary/10">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-foreground">{selectedProvider.provider_name}</h2>
-                  <p className="text-sm text-muted-foreground">{selectedProvider.service_name}</p>
+                  <h2 className="text-xl md:text-2xl font-bold text-foreground">{selectedProvider.provider_name}</h2>
+                  <p className="text-sm md:text-base text-muted-foreground mt-1">{selectedProvider.service_name}</p>
                 </div>
               </div>
 
               {isSimpleTelecom ? (
                 // Simple form for Mobile, DTH, Mobile Postpaid, Landline
-                <div className="space-y-4">
+                <div className="space-y-5 md:space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-foreground">
+                    <label className="block text-sm md:text-base font-semibold mb-3 text-foreground">
                       {selectedProvider.service_id === 1 ? 'Mobile Number' : 
                        selectedProvider.service_id === 2 ? 'Customer ID' :
                        selectedProvider.service_id === 3 ? 'Mobile Number' : 'Account Number'}
@@ -461,30 +474,30 @@ function UtilityPayments() {
                       value={number}
                       onChange={(e) => setNumber(e.target.value)}
                       placeholder="Enter number"
-                      className="bg-background border-border"
+                      className="h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl text-base"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-foreground">
-                      Amount
+                    <label className="block text-sm md:text-base font-semibold mb-3 text-foreground">
+                      Amount (₹)
                     </label>
                     <Input
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       placeholder="Enter amount"
-                      className="bg-background border-border"
+                      className="h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl text-base"
                     />
                   </div>
 
                   <Button
-                    className="w-full"
+                    className="w-full h-12 md:h-14 text-base md:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     disabled={loading || !number || !amount}
                     onClick={handleBillVerify}
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Processing...
                       </>
                     ) : (
@@ -494,29 +507,29 @@ function UtilityPayments() {
                 </div>
               ) : (
                 // Complex form for other services
-                <div className="space-y-4">
+                <div className="space-y-5 md:space-y-6">
                   {validationParams.map((param) => (
                     <div key={param.name}>
-                      <label className="block text-sm font-medium mb-2 text-foreground">
+                      <label className="block text-sm md:text-base font-semibold mb-3 text-foreground">
                         {param.placeholder}
                       </label>
                       <Input
                         value={optionalFields[param.name] || ''}
                         onChange={(e) => setOptionalFields({ ...optionalFields, [param.name]: e.target.value })}
                         placeholder={param.placeholder}
-                        className="bg-background border-border"
+                        className="h-12 bg-background/50 border-border/50 focus:border-primary/50 rounded-xl text-base"
                       />
                     </div>
                   ))}
 
                   <Button
-                    className="w-full"
+                    className="w-full h-12 md:h-14 text-base md:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     disabled={loading || !Object.values(optionalFields).some(v => v)}
                     onClick={handleBillVerify}
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Verifying...
                       </>
                     ) : (
@@ -531,40 +544,43 @@ function UtilityPayments() {
 
         {/* Payment Confirmation */}
         {step === 'payment' && selectedProvider && billDetails && (
-          <div className="max-w-xl mx-auto">
-            <div className="bg-card border border-border rounded-xl p-6 space-y-6">
-              <div className="text-center pb-4 border-b border-border">
-                <h2 className="text-xl font-semibold text-foreground">Bill Details</h2>
-                <p className="text-sm text-muted-foreground">{selectedProvider.provider_name}</p>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 md:p-8 space-y-6 md:space-y-8 shadow-xl">
+              <div className="text-center pb-6 border-b border-border/50">
+                <div className="inline-block p-3 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 mb-4">
+                  <CheckCircle className="h-10 w-10 md:h-12 md:w-12 text-primary" />
+                </div>
+                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Bill Details Verified</h2>
+                <p className="text-sm md:text-base text-muted-foreground">{selectedProvider.provider_name}</p>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground">Customer Name</span>
-                  <span className="font-medium text-foreground">{billDetails.name}</span>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3 md:py-4 border-b border-border/30">
+                  <span className="text-sm md:text-base text-muted-foreground">Customer Name</span>
+                  <span className="font-semibold text-sm md:text-base text-foreground">{billDetails.name}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground">Account Number</span>
-                  <span className="font-medium text-foreground">{billDetails.number}</span>
+                <div className="flex justify-between items-center py-3 md:py-4 border-b border-border/30">
+                  <span className="text-sm md:text-base text-muted-foreground">Account Number</span>
+                  <span className="font-semibold text-sm md:text-base text-foreground">{billDetails.number}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground">Due Date</span>
-                  <span className="font-medium text-foreground">{billDetails.duedate}</span>
+                <div className="flex justify-between items-center py-3 md:py-4 border-b border-border/30">
+                  <span className="text-sm md:text-base text-muted-foreground">Due Date</span>
+                  <span className="font-semibold text-sm md:text-base text-foreground">{billDetails.duedate}</span>
                 </div>
-                <div className="flex justify-between py-3 bg-primary/10 rounded-lg px-4">
-                  <span className="font-semibold text-foreground">Amount to Pay</span>
-                  <span className="font-bold text-primary text-xl">₹{billDetails.amount}</span>
+                <div className="flex justify-between items-center py-4 md:py-5 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl px-4 md:px-6 mt-2">
+                  <span className="font-bold text-base md:text-lg text-foreground">Amount to Pay</span>
+                  <span className="font-bold text-primary text-2xl md:text-3xl">₹{billDetails.amount}</span>
                 </div>
               </div>
 
               <Button
-                className="w-full"
+                className="w-full h-12 md:h-14 text-base md:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 disabled={loading}
                 onClick={handlePayment}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Processing Payment...
                   </>
                 ) : (
