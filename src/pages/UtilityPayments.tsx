@@ -137,7 +137,14 @@ function UtilityPayments() {
   const fetchProviders = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${API_BASE}/application/v1/get-provider?api_token=${API_TOKEN}`)
+      const formData = new FormData()
+      formData.append('api_token', API_TOKEN)
+
+      const response = await fetch(`${API_BASE}/application/v1/get-provider`, {
+        method: 'POST',
+        body: formData,
+      })
+      
       const data = await response.json()
       if (data.status === 'success') {
         setProviders(data.providers)
