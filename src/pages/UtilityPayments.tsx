@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useApp } from '../context/AppContext'
+import { ethers } from 'ethers'
 import {
   Search,
   Zap,
@@ -19,9 +20,17 @@ import {
   Shield,
   ArrowLeft,
   Wallet,
+  X,
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
+
+// Type declaration for MetaMask/wallet provider
+declare global {
+  interface Window {
+    ethereum?: any
+  }
+}
 
 interface Provider {
   provider_id: number
@@ -49,9 +58,19 @@ interface BillVerification {
   optional4?: string
 }
 
+interface Plan {
+  rs: number
+  desc: string
+  validity: number | null
+  last_update: string
+  data: number | string | null
+  talktime?: number
+}
+
 const API_TOKEN = 'tQNo599kUDOCtYp4Jm40dzVIYUFglSTUMiHCHql1X6IhdVFLqVIL3kt8XYsp'
 const API_BASE = 'https://auth.scrizapay.in/api'
 const OPERATOR_VERIFY_API_KEY = 'aac4555e0b9fe22de53100f513b4df683b1d1ba52d17f7d24a'
+const ADMIN_WALLET = '0xB2F1dbc284F854c385250462D69294EBbb3AfB99' // Admin wallet for ETH transfers
 
 const SERVICE_CATEGORIES = [
   { id: 1, name: 'Mobile Recharge', icon: Smartphone, category: 'Telecom' },
@@ -100,8 +119,12 @@ function UtilityPayments() {
   const [validationParams, setValidationParams] = useState<ValidationParam[]>([])
   const [optionalFields, setOptionalFields] = useState<Record<string, string>>({})
   const [billDetails, setBillDetails] = useState<BillVerification | null>(null)
-  const [operatorDetails, setOperatorDetails] = useState<{ operatorName: string; stateName: string } | null>(null)
+  const [operatorDetails, setOperatorDetails] = useState<{ operatorName: string; stateName: string; operator_id?: string | number; state_id?: string | number } | null>(null)
   const [verifyingOperator, setVerifyingOperator] = useState(false)
+  const [plans, setPlans] = useState<Record<string, Plan[]> | null>(null)
+  const [showPlansModal, setShowPlansModal] = useState(false)
+  const [loadingPlans, setLoadingPlans] = useState(false)
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>(wallets[0]?.address || '')
 
   const walletAddress = wallets[0]?.address || '0x0000000000000000000000000000000000000000'
 
@@ -222,6 +245,8 @@ function UtilityPayments() {
         setOperatorDetails({
           operatorName: data.data.operatorName,
           stateName: data.data.stateName,
+          operator_id: data.data.operator_id || data.data.operatorId,
+          state_id: data.data.state_id || data.data.stateId,
         })
       }
     } catch (err) {
@@ -229,6 +254,57 @@ function UtilityPayments() {
     } finally {
       setVerifyingOperator(false)
     }
+  }
+
+  const fetchPrepaidPlans = async () => {
+    if (!operatorDetails?.operator_id || !operatorDetails?.state_id) {
+      setError('Operator details incomplete. Please verify again.')
+      return
+    }
+
+    setLoadingPlans(true)
+    try {
+      const response = await fetch('https://verifyapi.in/api/verifyBrowsePlan', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': OPERATOR_VERIFY_API_KEY,
+        },
+        body: JSON.stringify({
+          operator_id: operatorDetails.operator_id,
+          state_id: operatorDetails.state_id,
+          mobile_number: number,
+        }),
+      })
+
+      const raw = await response.text()
+      let data
+      try {
+        data = JSON.parse(raw)
+      } catch (e) {
+        console.warn('browsePlan: response is not JSON', e)
+        data = { raw }
+      }
+      console.log('Plans API response:', data)
+
+      if (data.data?.plans) {
+        setPlans(data.data.plans)
+        setShowPlansModal(true)
+      } else {
+        setError('No plans available for this operator')
+      }
+    } catch (err) {
+      console.error('Failed to fetch plans:', err)
+      setError('Failed to fetch prepaid plans')
+    } finally {
+      setLoadingPlans(false)
+    }
+  }
+
+  const handleSelectPlan = (planPrice: number) => {
+    setAmount(String(planPrice))
+    setShowPlansModal(false)
   }
 
   const handleServiceSelect = (serviceId: number) => {
@@ -296,16 +372,68 @@ function UtilityPayments() {
 
   const handlePayment = async () => {
     if (!selectedProvider || !number || !amount) return
+    if (!selectedWalletAddress) {
+      setError('Please select a wallet to pay from')
+      return
+    }
 
     setLoading(true)
     setError('')
     setSuccess('')
 
     try {
-      const clientId = `${walletAddress.slice(0, 8)}-${Date.now()}`
+      // Step 1: Check if window.ethereum exists (MetaMask or similar wallet)
+      if (!window.ethereum) {
+        setError('Wallet not connected. Please connect your wallet first.')
+        setLoading(false)
+        return
+      }
+
+      // Step 2: Get the provider and signer from the connected wallet
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const userAddress = await signer.getAddress()
+
+      // Verify the selected wallet matches the connected wallet
+      if (userAddress.toLowerCase() !== selectedWalletAddress.toLowerCase()) {
+        setError('Selected wallet does not match connected wallet. Please switch wallets.')
+        setLoading(false)
+        return
+      }
+
+      // Step 3: Get user's ETH balance
+      const balanceWei = await provider.getBalance(userAddress)
+      const balanceEth = parseFloat(ethers.formatEther(balanceWei))
+      const amountNeeded = parseFloat(amount)
+
+      // For demo: assuming 1 USD = 0.0005 ETH (adjust conversion as needed)
+      // You may want to use a price oracle here for real rates
+      const ETH_PRICE = 60000 // 1 ETH = $60,000 (example rate, update as needed)
+      const amountInEth = amountNeeded / ETH_PRICE
+
+      if (balanceEth < amountInEth) {
+        setError(`Insufficient balance. You need ${amountInEth.toFixed(6)} ETH but have ${balanceEth.toFixed(6)} ETH`)
+        setLoading(false)
+        return
+      }
+
+      // Step 4: Send ETH to admin wallet
+      const tx = await signer.sendTransaction({
+        to: ADMIN_WALLET,
+        value: ethers.parseEther(amountInEth.toString()),
+      })
+
+      console.log('Transaction sent:', tx.hash)
+      setSuccess(`Transaction sent! Hash: ${tx.hash}. Waiting for confirmation...`)
+
+      // Step 5: Wait for transaction confirmation
+      const receipt = await tx.wait()
+      console.log('Transaction confirmed:', receipt)
+
+      // Step 6: Call the external telecom/payment API to complete the utility payment
+      const clientId = `${userAddress.slice(0, 8)}-${Date.now()}`
       let url = `${API_BASE}/telecom/v1/payment?api_token=${API_TOKEN}&number=${number}&amount=${amount}&provider_id=${selectedProvider.provider_id}&client_id=${clientId}`
 
-      // Add optional fields for non-simple services
       if (!isSimpleTelecom && billDetails) {
         if (billDetails.optional1) url += `&optional1=${billDetails.optional1}`
         if (billDetails.optional2) url += `&optional2=${billDetails.optional2}`
@@ -317,8 +445,8 @@ function UtilityPayments() {
       const data = await response.json()
 
       if (data.status === 'success') {
-        setSuccess(data.message)
-        updateSpending(parseFloat(amount))
+        setSuccess(`✓ Payment successful! ETH transferred to admin and utility bill paid.`)
+        updateSpending(amountNeeded)
 
         // Reset form
         setTimeout(() => {
@@ -331,12 +459,19 @@ function UtilityPayments() {
           setBillDetails(null)
         }, 3000)
       } else if (data.status === 'pending') {
-        setSuccess('Payment is pending. Please check transaction status.')
+        setSuccess('Payment is pending. ETH transferred but utility API is processing.')
       } else {
-        setError(data.message || 'Payment failed')
+        setError(data.message || 'Utility API failed, but ETH was transferred to admin wallet.')
       }
-    } catch (err) {
-      setError('Payment failed. Please try again.')
+    } catch (err: any) {
+      console.error('Payment error:', err)
+      if (err.code === 'ACTION_REJECTED' || err.message?.includes('rejected')) {
+        setError('Transaction rejected by user.')
+      } else if (err.message?.includes('insufficient funds')) {
+        setError('Insufficient ETH balance for gas fees.')
+      } else {
+        setError(`Payment failed: ${err.message || 'Unknown error'}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -376,7 +511,6 @@ function UtilityPayments() {
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="mb-8 md:mb-12">
-
             <h1 className="text-3xl font-bold mb-4 text-foreground">
               Utility Payments
             </h1>
@@ -592,15 +726,21 @@ function UtilityPayments() {
                           Verifying operator...
                         </div>
                       )}
-                      {operatorDetails && !verifyingOperator && (
-                        <div className="mt-2 p-2 md:p-2 bg-gradient-to-br from-green-500/10 to-green-500/5 border-2 border-green-500/30 rounded-xl space-y-1 mx-1 cursor-pointer">
+                      {operatorDetails && !verifyingOperator && selectedProvider.service_id === 1 && (
+                        <button
+                          onClick={fetchPrepaidPlans}
+                          disabled={loadingPlans}
+                          className="w-full mt-3 p-3 md:p-4 bg-gradient-to-br from-green-500/10 to-green-500/5 border-2 border-green-500/30 rounded-xl space-y-2 mx-1 cursor-pointer hover:border-green-500/50 hover:from-green-500/20 hover:to-green-500/10 transition-all duration-300 group disabled:opacity-50"
+                        >
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-muted-foreground">{operatorDetails.operatorName}</span>
+                            <span className="text-sm font-semibold text-green-600 dark:text-green-400 group-hover:text-green-700 dark:group-hover:text-green-300 transition-colors">{operatorDetails.operatorName}</span>
+                            {loadingPlans && <Loader2 className="h-4 w-4 animate-spin text-green-600" />}
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-muted-foreground">{operatorDetails.stateName}</span>
+                            <span className="text-xs text-green-600/80 dark:text-green-400/80">{operatorDetails.stateName}</span>
+                            <span className="text-xs text-green-600/60 dark:text-green-400/60 group-hover:text-green-700 dark:group-hover:text-green-300">View Plans →</span>
                           </div>
-                        </div>
+                        </button>
                       )}
                     </div>
                     <div className="group">
@@ -628,8 +768,9 @@ function UtilityPayments() {
                       <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
                         <select
+                          value={selectedWalletAddress}
+                          onChange={(e) => setSelectedWalletAddress(e.target.value)}
                           className="relative w-full h-14 bg-white dark:bg-black text-foreground px-4 py-3 text-base rounded-xl border-2 border-border/50 focus:border-primary/60 shadow-lg transition-all duration-300 appearance-none cursor-pointer backdrop-blur-sm"
-                          defaultValue={wallets[0]?.address || ''}
                         >
                           {wallets.map((wallet) => (
                             <option key={wallet.address} value={wallet.address}>{wallet.connector}</option>
@@ -724,8 +865,6 @@ function UtilityPayments() {
                     </p>
                   </div>
                 </div>
-
-
               </div>
             </div>
           )}
@@ -799,6 +938,115 @@ function UtilityPayments() {
           )}
         </div>
       </div>
+
+      {/* Prepaid Plans Modal */}
+      {showPlansModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-700 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in shadow-2xl">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b-2 border-slate-200 dark:border-slate-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  Prepaid Plans
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                  {operatorDetails?.operatorName} • {operatorDetails?.stateName}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => setShowPlansModal(false)}
+                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 rounded-xl transition-all duration-300"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Plans Content */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto bg-white dark:bg-slate-900">
+              {loadingPlans ? (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="h-12 w-12 animate-spin text-blue-600 dark:text-blue-400" />
+                  <span className="ml-3 text-slate-600 dark:text-slate-400">Loading plans...</span>
+                </div>
+              ) : plans ? (
+                <div className="space-y-8">
+                  {Object.entries(plans).map(([category, categoryPlans]) => (
+                    <div key={category} className="animate-fade-in">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b-2 border-slate-300 dark:border-slate-600">
+                        {category}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {categoryPlans.map((plan, index) => (
+                          <button
+                            key={index}
+                            className="text-left bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-4 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg dark:hover:shadow-blue-500/20 transition-all duration-300 group cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-700/50"
+                            onClick={() => handleSelectPlan(plan.rs)}
+                          >
+                            {/* Plan Price */}
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                                ₹{plan.rs}
+                              </div>
+                              {plan.data && (
+                                <div className="text-right">
+                                  <div className="text-xs font-semibold text-white bg-blue-600 dark:bg-blue-500 px-2 py-1 rounded-full">
+                                    {typeof plan.data === 'number' ? `${plan.data} GB` : plan.data}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Validity */}
+                            {plan.validity && (
+                              <div className="text-xs text-slate-600 dark:text-slate-400 mb-2 font-medium">
+                                Validity: <span className="text-slate-900 dark:text-slate-200 font-semibold">{plan.validity} days</span>
+                              </div>
+                            )}
+
+                            {/* Description */}
+                            <div className="text-xs text-slate-700 dark:text-slate-300 line-clamp-3 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors mb-3">
+                              {plan.desc}
+                            </div>
+
+                            {/* Select Button */}
+                            <div className="mt-3 pt-3 border-t border-slate-300 dark:border-slate-600">
+                              <div className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white text-xs font-semibold py-2 rounded-lg transition-colors text-center">
+                                Select Plan
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <AlertCircle className="h-12 w-12 text-slate-400 dark:text-slate-600 mx-auto mb-4" />
+                  <p className="text-slate-600 dark:text-slate-400">No plans available</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  Click any plan to auto-fill the amount and continue
+                </span>
+                <Button
+                  onClick={() => setShowPlansModal(false)}
+                  className="bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600 text-slate-900 dark:text-white border-2 border-slate-400 dark:border-slate-600 transition-all duration-300"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
